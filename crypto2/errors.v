@@ -1,0 +1,21 @@
+module crypto2
+
+const(
+	errInvalidSignatureReturned = error('ed25519 library returned an invalid signature')
+	errInvalidPrivateKey = error('invalid private key')
+	errMsigUnknownVersion = error('unknown version != 1')
+	errMsigInvalidThreshold = error('invalid threshold')
+	errMsigInvalidSecretKey = error('secret key has no corresponding public identity in multisig preimage')
+	errMsigMergeLessThanTwo = error('cannot merge fewer than two multisig transactions')
+	errMsigMergeKeysMismatch = error('multisig parameters do not match')
+	errMsigMergeInvalidDups = error('mismatched duplicate signatures')
+	errMsigMergeAuthAddrMismatch = error('mismatched AuthAddrs')
+	errLsigTooManySignatures = error('logicsig has too many signatures, at most one of Sig or Msig may be defined')
+	errLsigNoSignature = error('logicsig is not delegated')
+	errLsigInvalidSignature = error('invalid logicsig signature')
+	errLsigNoPublicKey = error('missing public key of delegated logicsig')
+	errLsigInvalidPublicKey = error('public key does not match logicsig signature')
+	errLsigInvalidProgram = error('invalid logicsig program')
+	errLsigEmptyMsig = error('empty multisig in logicsig')
+	errLsigAccountPublicKeyNotNeeded = error('a public key for the signer was provided when none was expected')
+)
