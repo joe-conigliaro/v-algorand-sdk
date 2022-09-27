@@ -21,7 +21,7 @@ examples/example1.v demonstrates creating a new account (wallet & mnemonic) and 
  - You will choose a data directory when installing the default is `~/.algorand`
  - Start your node `goal node start -d ALGORAND_DATA_DIR`
  - Replace `algod_token` in example1.v with the contents of `ALGORAND_DATA_DIR/algod.token`
- - You may also change the destination address
+ - You may also change the destination address, amount to send (make sure its no more than 5 Algo) etc.
  - Clone this repo: `git clone https://github.com/joe-conigliaro/v-algorand-sdk algorand`
  - Symlink the algorand module to `~/.vmodules`: `ln -s /full/path/to/algorand/src/algorand ~/.vmodules/algorand` 
  - Build custom v version to run demo (these changes are not in master yet, but will be soon after some fixes):
@@ -32,4 +32,6 @@ examples/example1.v demonstrates creating a new account (wallet & mnemonic) and 
  - Download `msgpack` module and add to `~/.vmodules`
     * `git clone https://github.com/vlang/msgpack`
     * `ln -s /full/path/to/msgpack ~/.vmodules/msgpack`
- - You can now use algorand_v to run examples/example1.v: `./algorand_v ../algorand/examples/example1.v`
+ - You can now use algorand_v to run examples/example1.v:
+    * Submit the transaction `./algorand_v ../algorand/examples/example1.v`
+    * verify the transaction was submitted to testnet `https://testnet.algoexplorer.io/tx/TRANSACTION_ID`
