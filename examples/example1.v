@@ -70,11 +70,11 @@ fn main() {
     println(' # Signed transaction. Transaction ID: $tx_id\n')
 
     // Submit the transaction
-    tx_id := algo_client.send_raw_transaction(context.background(), signed_txn) or {
+    resp_tx_id := algo_client.send_raw_transaction(context.background(), signed_txn) or {
         panic('failed to send transaction: $err')
     }
     // println(' # Submitted transaction $send_response'
-    println(' # Submitted transaction to the Algorand TestNet, Transaction ID: $tx_id\n')
+    println(' # Submitted transaction to the Algorand TestNet, Responded with Transaction ID: $resp_tx_id\n')
     
     // println(' # Waiting for confirmation...')
     // Wait for confirmation
