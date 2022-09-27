@@ -66,9 +66,6 @@ pub fn decode_address(addr string) ?Address {
 	// Interpret the address as base32
 	// decoded, err := base32.StdEncoding.WithPadding(base32.NoPadding).DecodeString(addr)
 	decoded := base32.new_std_encoding_with_padding(base32.no_padding).decode_string(addr)?
-	println('encoded addr: $addr')
-	println('decoded addr: $decoded.hex()')
-	println('decoded len: $decoded.len / ${hash_len_bytes+checksum_len_bytes}')
 
 	// Ensure the decoded address is the correct length
 	// if decoded.len != a.len+checksum_len_bytes {

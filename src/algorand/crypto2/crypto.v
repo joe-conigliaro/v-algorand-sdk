@@ -177,7 +177,6 @@ fn verify_bytes(pk ed25519.PublicKey, message []u8, signature []u8) bool {
 	// 	false
 	// }
 	if res := ed25519.verify(pk, to_be_verified, signature) {
-		println('#### res: $res')
 		return res
 	}
 	return false

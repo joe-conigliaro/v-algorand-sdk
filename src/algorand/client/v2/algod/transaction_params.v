@@ -19,9 +19,6 @@ import encoding.base64
 pub fn (mut c Client) get_suggested_params(ctx context.Context) ?types.SuggestedParams {
 	resp := c.get(ctx, "/v2/transactions/params", unsafe { nil }, [])?
 	// TODO automatic decode
-	println(resp)
-	println('resp genesis hash')
-	println(base64.decode(resp['genesis-hash'].str()))
 	return types.SuggestedParams{
 		fee: types.MicroAlgos(resp['fee'].u64())
 		genesis_id: resp['genesis-id'].str()
