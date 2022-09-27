@@ -5,26 +5,31 @@ pub struct Transaction {
 	// Common fields for all types of transactions
 	Header
 	// Fields for different types of transactions
-	KeyregTxnFields
+	// KeyregTxnFields
 	PaymentTxnFields
-	AssetConfigTxnFields
-	AssetTransferTxnFields
-	AssetFreezeTxnFields
-	ApplicationFields
+	// TODO: skip empty or refactor this
+	// AssetConfigTxnFields
+	// AssetTransferTxnFields
+	// AssetFreezeTxnFields
+	// ApplicationFields
 pub:
-	struct_ struct{} [codec:',omitempty,omitemptyarray']
+	// struct_ struct{} [codec:',omitempty,omitemptyarray']
 
 	// Type of transaction
-	type_ TxType [codec:'type']
+	//  TODO:
+	// type_ TxType [codec:'type']
+	type_ string [codec:'type']
 }
 
 // SignedTxn wraps a transaction and a signature. The encoding of this struct
 // is suitable to broadcast on the network
+[codec: 'omitempty,omitemptyarray']
 pub struct SignedTxn {
 pub mut:
-	struct_   struct{} 	  [codec: ',omitempty,omitemptyarray']
+	// struct_   struct{} 	  [codec: ',omitempty,omitemptyarray']
 
 	sig       Signature   [codec: 'sig']
+	// sig       []u8   	  [codec: 'sig']
 	msig      MultisigSig [codec: 'msig']
 	lsig      LogicSig    [codec: 'lsig']
 	txn       Transaction [codec: 'txn']
@@ -32,24 +37,30 @@ pub mut:
 }
 
 // KeyregTxnFields captures the fields used for key registration transactions.
-struct KeyregTxnFields {
-	struct_ struct{} [codec:',omitempty,omitemptyarray']
+[codec:',omitempty,omitemptyarray']
+pub struct KeyregTxnFields {
+	// struct_ struct{} [codec:',omitempty,omitemptyarray']
 
 	vote_pk           VotePK         [codec:'votekey']
 	selection_pk      VRFPK          [codec:'selkey']
-	vote_first        Round          [codec:'votefst']
-	vote_last         Round          [codec:'votelst']
+	// TODO:
+	// vote_first        Round          [codec:'votefst']
+	// vote_last         Round          [codec:'votelst']
+	vote_first        u64          [codec:'votefst']
+	vote_last         u64          [codec:'votelst']
 	vote_key_dilution u64         [codec:'votekd']
 	nonparticipation  bool           [codec:'nonpart']
 	state_proof_pk    MerkleVerifier [codec:'sprfkey']
 }
 
 // PaymentTxnFields captures the fields used by payment transactions.
+[codec:',omitempty,omitemptyarray']
 pub struct PaymentTxnFields {
-	struct_ struct{} [codec:',omitempty,omitemptyarray']
+	// struct_ struct{} [codec:',omitempty,omitemptyarray']
 
 	receiver Address    [codec:'rcv']
-	amount   MicroAlgos [codec:'amt']
+	// amount   MicroAlgos [codec:'amt']
+	amount   u64 [codec:'amt']
 
 	// When close_remainder_to is set, it indicates that the
 	// transaction is requesting that the account should be
@@ -60,8 +71,9 @@ pub struct PaymentTxnFields {
 
 // AssetConfigTxnFields captures the fields used for asset
 // allocation, re-configuration, and destruction.
-struct AssetConfigTxnFields {
-	struct_ struct{} [codec:',omitempty,omitemptyarray']
+[codec:',omitempty,omitemptyarray']
+pub struct AssetConfigTxnFields {
+	// struct_ struct{} [codec:',omitempty,omitemptyarray']
 
 	// config_asset is the asset being configured or destroyed.
 	// A zero value means allocation.
@@ -73,8 +85,9 @@ struct AssetConfigTxnFields {
 }
 
 // AssetTransferTxnFields captures the fields used for asset transfers.
-struct AssetTransferTxnFields {
-	struct_ struct{} [codec:',omitempty,omitemptyarray']
+[codec:',omitempty,omitemptyarray']
+pub struct AssetTransferTxnFields {
+	// struct_ struct{} [codec:',omitempty,omitemptyarray']
 
 	xfer_asset AssetIndex [codec:'xaid']
 
@@ -100,8 +113,9 @@ struct AssetTransferTxnFields {
 }
 
 // AssetFreezeTxnFields captures the fields used for freezing asset slots.
-struct AssetFreezeTxnFields {
-	struct_ struct{} [codec:',omitempty,omitemptyarray']
+[codec:',omitempty,omitemptyarray']
+pub struct AssetFreezeTxnFields {
+	// struct_ struct{} [codec:',omitempty,omitemptyarray']
 
 	// freeze_account is the address of the account whose asset
 	// slot is being frozen or un-frozen.
@@ -115,14 +129,19 @@ struct AssetFreezeTxnFields {
 }
 
 // Header captures the fields common to every transaction type.
+[codec:',omitempty,omitemptyarray']
 pub struct Header {
 pub mut:
-	struct_ struct{} [codec:',omitempty,omitemptyarray']
+	// struct_ struct{} [codec:',omitempty,omitemptyarray']
 
 	sender       Address    [codec:'snd']
-	fee          MicroAlgos [codec:'fee']
-	first_valid  Round      [codec:'fv']
-	last_valid   Round      [codec:'lv']
+	// TODO:
+	// fee          MicroAlgos [codec:'fee']
+	// first_valid  Round      [codec:'fv']
+	// last_valid   Round      [codec:'lv']
+	fee          u64 [codec:'fee']
+	first_valid  u64      [codec:'fv']
+	last_valid   u64      [codec:'lv']
 	note         []u8       [codec:'note']
 	genesis_id   string     [codec:'gen']
 	genesis_hash Digest     [codec:'gh']
@@ -150,7 +169,7 @@ pub mut:
 // together in a specific order in a block.
 pub struct TxGroup {
 pub mut:
-	struct_ struct{} [codec:',omitempty,omitemptyarray']
+	// struct_ struct{} [codec:',omitempty,omitemptyarray']
 
 	// tx_group_hashes specifies a list of hashes of transactions that must appear
 	// together, sequentially, in a block in order for the group to be

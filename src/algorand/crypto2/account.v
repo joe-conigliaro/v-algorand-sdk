@@ -184,7 +184,7 @@ fn logic_sig_address(lsig types.LogicSig) types.Address {
 // LogicSigAccount represents an account that can sign with a LogicSig program.
 struct LogicSigAccount {
 mut:
-	struct_ struct{} 			  [codec:',omitempty,omitemptyarray']
+	// struct_ struct{} 			  [codec:',omitempty,omitemptyarray']
 
 	// The underlying LogicSig object
 	lsig types.LogicSig 		  [codec:'lsig']

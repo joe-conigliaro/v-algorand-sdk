@@ -31,11 +31,10 @@ import algorand.client.v2.common.models
 // }
 
 pub fn (mut c Client) send_raw_transaction(ctx context.Context, raw_txn []u8) ?string {
-	// resp := c.post(ctx, "/v2/transactions", unsafe { nil }, [])?
-	// resp_str := resp as string
+	resp := c.post(ctx, "/v2/transactions", unsafe { nil }, [], raw_txn)?
 	// println('send_raw_transaction resp: $resp')
-	// resp_decoded := json2.raw_decode(resp_str)?
-	// return decoded.txid
-	// TODO:
-	return ''
+	tx_id := resp['txid'] or {
+		return 'error decoding txid'
+	}
+	return tx_id.str()
 }

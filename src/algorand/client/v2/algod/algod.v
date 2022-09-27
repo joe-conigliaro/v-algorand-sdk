@@ -23,18 +23,18 @@ fn (mut c Client) get<T>(ctx context.Context, path string, body T, headers []&co
 }
 
 // getMsgpack performs a GET request to the specific path against the server, assumes msgpack resp
-fn (mut c Client) get_msgpack<T>(ctx_1 context.Context, response_1 T, path_1 string, body_1 T, headers_1 []&common.Header) error {
-	return common.client.get_raw_msgpack(ctx_1, response_1, path_1, body_1, headers_1)
+fn (mut c Client) get_msgpack<T>(ctx_1 context.Context, response_1 T, path_1 string, body_1 T, headers_1 []&common.Header) ?map[string]json2.Any {
+	return c.c.get_raw_msgpack(ctx_1, response_1, path_1, body_1, headers_1)
 }
 
 // getMsgpack performs a GET request to the specific path against the server, assumes msgpack resp
 fn (mut c Client) get_raw<T>(ctx_2 context.Context, path_2 string, body_2 T, headers_2 []&common.Header) ?[]u8 {
-	return common.client.get_raw(ctx_2, path_2, body_2, headers_2)
+	return c.c.get_raw(ctx_2, path_2, body_2, headers_2)
 }
 
 // post sends a POST request to the given path with the given request obj
-fn (mut c Client) post<T>(ctx_3 context.Context, response_2 T, path_3 string, params T, headers_3 []&common.Header, body_3 T) error {
-	return *common.client.post(ctx_3, response_2, path_3, params, headers_3, body_3)
+fn (mut c Client) post<T>(ctx_3 context.Context, path_3 string, params T, headers_3 []&common.Header, body []u8) ?map[string]json2.Any {
+	return c.c.post(ctx_3, path_3, params, headers_3, body)
 }
 
 // MakeClient is the factory for constructing a ClientV2 for a given endpo

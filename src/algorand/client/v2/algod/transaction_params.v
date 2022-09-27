@@ -5,6 +5,7 @@ import context
 import types
 import client.v2.common.models
 import x.json2
+import encoding.base64
 // "github.com/algorand/go-algorand-sdk/client/v2/common"
 // "github.com/algorand/go-algorand-sdk/client/v2/common/models"
 // "github.com/algorand/go-algorand-sdk/types"
@@ -17,12 +18,18 @@ import x.json2
 
 pub fn (mut c Client) get_suggested_params(ctx context.Context) ?types.SuggestedParams {
 	resp := c.get(ctx, "/v2/transactions/params", unsafe { nil }, [])?
-	// resp_str := resp as string
-	println('get_suggested_params resp: $resp')
-	// resp_decoded := json2.raw_decode(resp_str)?
-	// resp_decoded_map := resp_decoded.as_map()
+	// TODO automatic decode
+	println(resp)
+	println('resp genesis hash')
+	println(base64.decode(resp['genesis-hash'].str()))
 	return types.SuggestedParams{
-		// fee: types.MicroAlgos(resp_decoded_map['fee'])
+		fee: types.MicroAlgos(resp['fee'].u64())
+		genesis_id: resp['genesis-id'].str()
+		genesis_hash: base64.decode(resp['genesis-hash'].str()) // eiip
+		first_round_valid: types.Round(resp['last-round'].u64())
+		last_round_valid: types.Round(resp['last-round'].u64() + 1000)
+		consensus_version: resp['consensus-version'].str()
+		min_fee: resp['min-fee'].u64()
 	}
 }
 

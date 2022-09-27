@@ -29,7 +29,7 @@ pub fn make_payment_txn(from string, to string, fee u64, amount u64, first_round
 	close_remainder_to_addr := if close_remainder_to != '' {
 		types.decode_address(close_remainder_to)?
 	} else {
-		types.new_addrress()
+		types.new_address()
 	}
 
 	// Decode GenesisHash
@@ -75,7 +75,7 @@ pub fn make_payment_txn(from string, to string, fee u64, amount u64, first_round
 // `from` and `to` addresses should be checksummed, human-readable addresses
 // fee is a flat fee
 // Deprecated: next major version will use a Params object, see package future
-pub fn make_payment_txn_with_flat_fee(from, to string, fee, amount, first_round, last_round u64, note []u8, close_remainder_to, genesis_id string, genesis_hash []u8) ?types.Transaction {
+pub fn make_payment_txn_with_flat_fee(from string, to string, fee u64, amount u64, first_round u64, last_round u64, note []u8, close_remainder_to string, genesis_id string, genesis_hash []u8) ?types.Transaction {
 	mut tx := make_payment_txn(from, to, fee, amount, first_round, last_round, note, close_remainder_to, genesis_id, genesis_hash)?
 	tx.fee = types.MicroAlgos(fee)
 

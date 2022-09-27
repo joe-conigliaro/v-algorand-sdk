@@ -2,7 +2,7 @@ module types
 
 // Bid represents a bid by a user as part of an auction.
 pub struct Bid {
-	struct_ struct{} [codec:',omitempty,omitemptyarray']
+	// struct_ struct{} [codec:',omitempty,omitemptyarray']
 
 	// bidder_key identifies the bidder placing this bid.
 	bidder_key Address [codec:'bidder']
@@ -32,7 +32,7 @@ pub struct Bid {
 
 // SignedBid represents a signed bid by a bidder.
 pub struct SignedBid {
-	struct_ struct{} [codec:',omitempty,omitemptyarray']
+	// struct_ struct{} [codec:',omitempty,omitemptyarray']
 
 	// bid contains information about the bid.
 	bid Bid [codec:'bid']
@@ -62,7 +62,7 @@ pub const (
 
 // NoteField is the struct that represents an auction message.
 pub struct NoteField {
-	struct_ struct{} [codec:',omitempty,omitemptyarray']
+	// struct_ struct{} [codec:',omitempty,omitemptyarray']
 
 	// type_ indicates which type of a message this is
 	type_ NoteFieldType [codec:'t']

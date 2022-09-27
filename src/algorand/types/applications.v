@@ -2,7 +2,7 @@ module types
 
 // This file has the applications specific structures
 
-struct ApplicationFields {
+pub struct ApplicationFields {
 	ApplicationCallTxnFields
 }
 
@@ -11,7 +11,7 @@ struct ApplicationFields {
 // AppParams
 type AppIndex = u64
 
-const (
+pub const (
 	// encoded_max_application_args sets the allocation bound for the maximum
 	// number of ApplicationArgs that a transaction decoded off of the wire
 	// can contain. Its value is verified against consensus parameters in
@@ -41,7 +41,7 @@ const (
 // ApplicationCall transaction will have if it is included in a block.
 //go:generate stringer -type=OnCompletion -output=application_string.go
 
-enum OnCompletion {
+pub enum OnCompletion {
 	// no_op_oc indicates that an application transaction will simply call its
 	// ApprovalProgram
 	no_op_oc
@@ -71,8 +71,8 @@ enum OnCompletion {
 
 // ApplicationCallTxnFields captures the transaction fields used for all
 // interactions with applications
-struct ApplicationCallTxnFields {
-	struct_ struct{} [codec:',omitempty,omitemptyarray']
+pub struct ApplicationCallTxnFields {
+	// struct_ struct{} [codec:',omitempty,omitemptyarray']
 
 	application_id   AppIndex     [codec:'apid']
 	on_completion    OnCompletion [codec:'apan']
@@ -92,8 +92,8 @@ struct ApplicationCallTxnFields {
 }
 
 // StateSchema sets maximums on the number of each type that may be stored
-struct StateSchema {
-	struct_ struct{} [codec:',omitempty,omitemptyarray']
+pub struct StateSchema {
+	// struct_ struct{} [codec:',omitempty,omitemptyarray']
 
 	num_uint       u64 [codec:'nui']
 	num_byte_slice u64 [codec:'nbs']
@@ -103,7 +103,7 @@ const empty_state_scheme = StateSchema{}
 
 // empty indicates whether or not all the fields in the
 // ApplicationCallTxnFields are zeroed out
-fn (ac &ApplicationCallTxnFields) empty() bool {
+pub fn (ac &ApplicationCallTxnFields) empty() bool {
 	if ac.application_id != 0 {
 		return false
 	}

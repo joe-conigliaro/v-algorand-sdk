@@ -1,6 +1,6 @@
 module types
 
-const(
+pub const(
 	// asset_name_max_len is the max length in bytes for the asset name
 	asset_name_max_len = 32
 
@@ -22,8 +22,8 @@ const(
 type AssetIndex = u64
 
 // AssetParams describes the parameters of an asset.
-struct AssetParams {
-	struct_ struct{} [codec:',omitempty,omitemptyarray']
+pub struct AssetParams {
+	// struct_ struct{} [codec:',omitempty,omitemptyarray']
 
 	// total specifies the total number of units of this asset
 	// created.
@@ -76,6 +76,6 @@ const zero_ap = AssetParams{}
 
 // IsZero returns true if the AssetParams struct is completely empty.
 // The AssetParams zero object is used in destroying an asset.
-fn (ap AssetParams) is_zero() bool {
+pub fn (ap AssetParams) is_zero() bool {
 	return ap == zero_ap
 }

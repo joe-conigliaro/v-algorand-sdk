@@ -21,7 +21,9 @@ pub fn new_address_from_u8_array(a []u8) Address {
 	return a
 }
 
-pub fn new_addrress() Address {
+// TODO
+pub fn new_address() Address {
+// pub fn new_address() []u8 {
 	return []u8{len: hash_len_bytes}
 }
 
@@ -36,8 +38,13 @@ pub fn (a Address) str() string {
 
 	// Append the checksum and encode as base32
 	// checksum_address := append(a[:], checksum_len_bytes...)
-	mut checksum_address := a
+	mut checksum_address := a.clone()
 	checksum_address << checksum_len_bytes_
+	
+	// encoded_addr := base32.new_std_encoding_with_padding(base32.no_padding).encode_to_string(checksum_address)
+	// println(checksum_address.bytestr())
+	// println('# checksum_address len: $checksum_address.len')
+	// println('# encoded_addr: $encoded_addr')
 	// return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(checksum_address)
 	return base32.new_std_encoding_with_padding(base32.no_padding).encode_to_string(checksum_address)
 }
@@ -45,7 +52,7 @@ pub fn (a Address) str() string {
 // zero_address is Address with all zero bytes. For handy == != comparisons.
 const(
 	// zero_address Address = [hash_len_bytes]byte{}
-	zero_address = new_addrress()
+	zero_address = new_address()
 )
 
 // is_zero returs true if the Address is all zero bytes.
@@ -59,6 +66,9 @@ pub fn decode_address(addr string) ?Address {
 	// Interpret the address as base32
 	// decoded, err := base32.StdEncoding.WithPadding(base32.NoPadding).DecodeString(addr)
 	decoded := base32.new_std_encoding_with_padding(base32.no_padding).decode_string(addr)?
+	println('encoded addr: $addr')
+	println('decoded addr: $decoded.hex()')
+	println('decoded len: $decoded.len / ${hash_len_bytes+checksum_len_bytes}')
 
 	// Ensure the decoded address is the correct length
 	// if decoded.len != a.len+checksum_len_bytes {
@@ -75,6 +85,14 @@ pub fn decode_address(addr string) ?Address {
 	// Compute the expected checksum
 	checksum_hash := sha512.sum512_256(address_bytes)
 	expected_checksum_bytes := checksum_hash[hash_len_bytes-checksum_len_bytes..]
+
+	// println('address_bytes.len: $address_bytes.len')
+	// println('address_bytes: $address_bytes')
+	// println('decoded: $decoded')
+	// println('hash_len_bytes-checksum_len_bytes: ${hash_len_bytes-checksum_len_bytes}')
+	// println('checksum_hash: $checksum_hash')
+	// println('checksum_bytes: $checksum_bytes')
+	// println('expected_checksum_bytes: $expected_checksum_bytes')
 
 	// Check the checksum
 	// if !bytes.Equal(expected_checksum_bytes, checksum_bytes) {

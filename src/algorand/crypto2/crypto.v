@@ -84,7 +84,10 @@ pub fn sign_transaction(sk ed25519.PrivateKey, tx types.Transaction) ?(string, [
 	}
 
 	// Encode the SignedTxn
-	stx_bytes := msgpack.encode(stx)
+	// stx_bytes := msgpack.encode(stx)
+	// TODO:
+	stx_bytes := stx.encode()
+
 	return txid, stx_bytes
 }
 
@@ -92,7 +95,9 @@ pub fn sign_transaction(sk ed25519.PrivateKey, tx types.Transaction) ?(string, [
 // and compute txID from.
 fn raw_transaction_bytes_to_sign(tx types.Transaction) []u8 {
 	// Encode the transaction as msgpack
-	encoded_tx := msgpack.encode(tx)
+	// encoded_tx := msgpack.encode(tx)
+	// TODO:
+	encoded_tx := tx.encode()
 
 	// Prepend the hashable prefix
 	// msg_parts := [][]byte{txid_prefix, encoded_tx}
@@ -163,12 +168,19 @@ fn sign_bytes(sk ed25519.PrivateKey, bytes_to_sign []u8) ?[]u8 {
 }
 
 // VerifyBytes verifies that the signature is valid
-fn verify_bytes(pk ed25519.PublicKey, message, signature []u8) bool {
+fn verify_bytes(pk ed25519.PublicKey, message []u8, signature []u8) bool {
 	// msg_parts := [][]byte{bytes_prefix, message}
 	// to_be_verified := bytes.Join(msg_parts, nil)
 	mut to_be_verified := bytes_prefix.clone()
 	to_be_verified << message
-	return ed25519.verify(pk, to_be_verified, signature) or { false }
+	// return ed25519.verify(pk, to_be_verified, signature) or { 
+	// 	false
+	// }
+	if res := ed25519.verify(pk, to_be_verified, signature) {
+		println('#### res: $res')
+		return res
+	}
+	return false
 }
 
 // SignBid accepts a private key and a bid, and returns the signature of the
@@ -298,10 +310,10 @@ fn merge_multisig_transactions(stxs_bytes ...[]u8) ?(string, []u8) {
 	// var refAuthAddr types.Address
 	// TODO: fix all of this & reference stuff
 	mut sig := types.MultisigSig{}
-	mut addr := types.new_addrress()
+	mut addr := types.new_address()
 	mut ref_addr := &addr
 	mut ref_tx := types.Transaction{}
-	mut ref_auth_addr := types.new_addrress()
+	mut ref_auth_addr := types.new_address()
 	for part_stx_bytes in stxs_bytes {
 		// part_stx := types.SignedTxn{}
 		// err = msgpack.Decode(partStxBytes, &partStx)
@@ -330,7 +342,8 @@ fn merge_multisig_transactions(stxs_bytes ...[]u8) ?(string, []u8) {
 		}
 
 		// if partAddr != *ref_addr {
-		if part_addr != &ref_addr {
+		// TODO: ?
+		if part_addr != ref_addr {
 			return errMsigMergeKeysMismatch
 		}
 
@@ -654,7 +667,7 @@ fn make_logic_sig(program []u8, args [][]u8, sk ed25519.PrivateKey, ma MultisigA
 	mut lsig := types.LogicSig{}
 	// if sk == nil && ma.blank() {
 	// TODO: fix nil
-	if sk == unsafe { nil } && ma.blank() {
+	if sk.len == 0 && ma.blank() {
 		lsig.logic = program
 		lsig.args = args
 		return lsig

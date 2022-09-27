@@ -3,7 +3,8 @@ module types
 import crypto.ed25519
 
 pub const(
-	zero_signature = new_signature()
+	// zero_signature = new_signature()
+	zero_signature = []u8{}
 )
 // Signature is an ed25519 signature
 // type Signature = [ed25519.signature_size]u8 // TODO: this seems like it should work fine also
@@ -14,24 +15,27 @@ pub fn (s Signature) to_u8_array() []u8 {
 	return s
 }
 
+// pub fn (s Signature) str() string {
+// 	return s.hex()
+// }
+
 pub fn new_signature() Signature {
 	return []u8{}
 }
 
 // MultisigSubsig contains a single public key and, optionally, a signature
+[codec:',omitempty,omitemptyarray']
 pub struct MultisigSubsig {
 pub mut:
-	struct_ struct{} 	  [codec:',omitempty,omitemptyarray']
-
 	key ed25519.PublicKey [codec:'pk']
-	sig Signature         [codec:'s']
+	// sig Signature         [codec:'s']
+	sig []u8         		 [codec:'s']
 }
 
 // MultisigSig holds multiple Subsigs, as well as threshold and version info
+ [codec: ',omitempty,omitemptyarray']
 pub struct MultisigSig {
 pub mut:
-	struct_ struct{} 		   [codec: ',omitempty,omitemptyarray']
-
 	version   u8               [codec:'v']
 	threshold u8               [codec:'thr']
 	subsigs   []MultisigSubsig [codec:'subsig']
@@ -58,16 +62,16 @@ pub fn (msig MultisigSig) blank() bool {
 // LogicSig is signed by an account, allowing delegation of operations.
 // OR
 // LogicSig defines a contract account.
+[codec: ',omitempty,omitemptyarray']
 pub struct LogicSig {
 pub mut:
-	struct_ struct{} [codec: ',omitempty,omitemptyarray']
-
 	// Logic signed by Sig or Msig
 	// OR hashed to be the Address of an account.
 	logic []u8 [codec: 'l']
 
 	// The signature of the account that has delegated to this LogicSig, if any
-	sig Signature [codec: 'sig']
+	// sig Signature [codec: 'sig']
+	sig []u8 [codec: 'sig']
 
 	// The signature of the multisig account that has delegated to this LogicSig, if any
 	msig MultisigSig [codec: 'msig']

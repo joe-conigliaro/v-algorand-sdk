@@ -69,6 +69,10 @@ pub const(
 // type Digest = [hash_len_bytes]u8
 pub type Digest = []u8
 
+pub fn (d Digest) bytes() []u8 {
+	return d
+}
+
 pub fn new_digest() Digest {
 	return []u8{}
 }

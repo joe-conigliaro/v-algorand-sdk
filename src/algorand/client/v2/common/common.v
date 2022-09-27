@@ -98,7 +98,7 @@ fn merge_raw_queries(q1 string, q2 string) string {
 }
 
 // submitFormRaw is a helper used for submitting (ex.) GETs and POSTs to the se
-fn (mut client Client) submit_form_raw<T>(ctx context.Context, path string, params T, request_method http.Method, encodeJSON bool, headers_1 []&Header, body T) ?http.Response {
+fn (mut client Client) submit_form_raw<T>(ctx context.Context, path string, params T, request_method http.Method, encodeJSON bool, headers_1 []&Header, body []u8) ?http.Response {
 	mut query_url := client.server_url
 	query_url.path += path
 	// mut req := &http.Request{}
@@ -121,11 +121,19 @@ fn (mut client Client) submit_form_raw<T>(ctx context.Context, path string, para
 	// 	mut json_value := json.encode(params)
 	// 	body_reader = bytes.new_buffer(json_value)
 	// }
-	body_json := ''
-	query_url.raw_query = merge_raw_queries(query_url.raw_query, v.encode())
-	mut req := http.new_request(request_method, query_url.str(), body_json)?
-	req.add_custom_header(client.api_header, client.api_token)?
-	return req.do()
+	if request_method == .post {
+		// query_url.raw_query = merge_raw_queries(query_url.raw_query, v.encode())
+		mut req := http.new_request(request_method, query_url.str(), body.bytestr())?
+		req.add_custom_header(client.api_header, client.api_token)?
+		return req.do()
+	} else {
+		body_json := ''
+		query_url.raw_query = merge_raw_queries(query_url.raw_query, v.encode())
+		mut req := http.new_request(request_method, query_url.str(), body_json)?
+		req.add_custom_header(client.api_header, client.api_token)?
+		return req.do()
+	}
+
 	// if err_2 != unsafe { nil } {
 	// 	return unsafe { nil }, err_2
 	// }
@@ -147,8 +155,8 @@ fn (mut client Client) submit_form_raw<T>(ctx context.Context, path string, para
 	// return resp, unsafe { nil }
 }
 
-fn (mut client Client) submit_form<T>(ctx_1 context.Context, path_1 string, params_1 T, request_method http.Method, encodeJSON_1 bool, headers_2 []&Header, body_1 T) ?map[string]json2.Any {
-	mut resp := client.submit_form_raw(ctx_1, path_1, params_1, request_method, encodeJSON_1, headers_2, body_1)?
+fn (mut client Client) submit_form<T>(ctx_1 context.Context, path_1 string, params_1 T, request_method http.Method, encodeJSON_1 bool, headers_2 []&Header, body []u8) ?map[string]json2.Any {
+	mut resp := client.submit_form_raw(ctx_1, path_1, params_1, request_method, encodeJSON_1, headers_2, body)?
 	// defer {
 	// 	resp.body.close()
 	// }
@@ -169,12 +177,12 @@ fn (mut client Client) submit_form<T>(ctx_1 context.Context, path_1 string, para
 
 // Get performs a GET request to the specific path against the se
 pub fn (mut client Client) get<T>(ctx_2 context.Context, path_2 string, params_2 T, headers_3 []&Header) ?map[string]json2.Any {
-	return client.submit_form(ctx_2, path_2, params_2, http.Method.get, false, headers_3, unsafe { nil })
+	return client.submit_form(ctx_2, path_2, params_2, http.Method.get, false, headers_3, [])
 }
 
 // GetRaw performs a GET request to the specific path against the server and returns the raw body by
 pub fn (mut client Client) get_raw<T>(ctx_3 context.Context, path_3 string, params_3 T, headers_4 []&Header) ?[]u8 {
-	resp_1 := client.submit_form_raw(ctx_3, path_3, params_3, http.Method.get, false, headers_4, unsafe { nil })
+	resp_1 := client.submit_form_raw(ctx_3, path_3, params_3, http.Method.get, false, headers_4, [])
 	defer {
 		resp_1.body.close()
 	}
@@ -209,26 +217,28 @@ pub fn (mut client Client) get_raw<T>(ctx_3 context.Context, path_3 string, para
 // }
 
 // Post sends a POST request to the given path with the given body obj
-pub fn (mut client Client) post<T>(ctx_5 context.Context, response_4 T, path_5 string, params_5 T, headers_6 []&Header, body_2 T) error {
-	return client.submit_form(ctx_5, response_4, path_5, params_5, http.Method.post, true, headers_6,
-		body_2)
+pub fn (mut client Client) post<T>(ctx_5 context.Context, path_5 string, params_5 T, headers_6 []&Header, body []u8) ?map[string]json2.Any {
+	return client.submit_form(ctx_5, path_5, params_5, http.Method.post, true, headers_6, body)
 }
 
 // Helper function for correctly formatting and escaping URL path paramet
-pub fn escape_params<T>(params_6 ...T) []T {
-	mut params_str := []
-	{
-		len:
-		params_6.len
-	}
-	for i, param in params_6 {
-		mut v := param
-		match param.type_name() {
+pub fn escape_params<T>(params ...T) []T {
+	mut params_str := []string{len: params.len}
+	for i, param in params {
+		// mut v := param
+		// if param is String {
+		// 	params_str[i] = urllib.path_escape(v)
+		// }
+		// $else {
+		// 	params_str[i] = strconv.v_sprintf('%v', v)
+		// }
+		match typeof(param).name {
 			'string' {
-				params_str[i] = urllib.path_escape(v)
+				params_str[i] = urllib.path_escape(param)
 			}
 			else {
-				params_str[i] = strconv.v_sprintf('%v', v)
+				params_str[i] = 'TODO'
+				// params_str[i] = strconv.v_sprintf('%v', param)
 			}
 		}
 	}

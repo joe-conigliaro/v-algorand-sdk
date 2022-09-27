@@ -3,6 +3,7 @@ module algod
 import context
 import v2.common
 import algorand.client.v2.common.models
+import strconv
 
 // AccountInformationParams contains all of the query parameters for url serialization.
 struct AccountInformationParams {
@@ -42,6 +43,13 @@ struct AccountInformation {
 
 pub fn (mut c Client) get_account_information(ctx context.Context, address string, headers ...&common.Header) ?models.Account {
 	// resp := c.get(ctx, '/v2/address/params/' + common.escape_params(address), [], [])?
+	escaped := common.escape_params(address)
+	resp := c.get(ctx, '/v2/accounts/' + address, unsafe { nil }, [])?
 	// println('get_account_information resp: $resp')
-	return models.Account{}
+	// TODO: automatic decode to structure
+	return models.Account{
+		address: resp['address'].str() // eiiip
+		amount: resp['amount'].u64()
+		// TODO: all fields
+	}
 }
