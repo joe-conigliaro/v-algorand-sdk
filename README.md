@@ -33,5 +33,5 @@ examples/example1.v demonstrates creating a new account (wallet & mnemonic) and 
     * `git clone https://github.com/vlang/msgpack`
     * `ln -s /full/path/to/msgpack ~/.vmodules/msgpack`
  - You can now use algorand_v to run examples/example1.v:
-    * Submit the transaction `./algorand_v ../algorand/examples/example1.v`
-    * verify the transaction was submitted to testnet `https://testnet.algoexplorer.io/tx/TRANSACTION_ID`
+    * Run the example, it will walk you through submitting a transaction `./algorand_v ../algorand/examples/example1.v`
+    * Verify the transaction was submitted to testnet `https://testnet.algoexplorer.io/tx/TRANSACTION_ID`
