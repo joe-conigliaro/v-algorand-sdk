@@ -32,7 +32,7 @@ demonstrates creating a new account (wallet & mnemonic) and submitting a transac
     * `git checkout comptime_selector_generic_call`
     * `v -cg -o algorand_v cmd/v`
  - You can now use algorand_v to run examples/basic_transaction.v:
-    * Running it will walk you through submitting a transaction `./algorand_v ../algorand/examples/basic_transaction.v`
+    * Running it will walk you through submitting a transaction `./algorand_v run ../algorand/examples/basic_transaction.v`
     * Verify the transaction was submitted to testnet `https://testnet.algoexplorer.io/tx/TRANSACTION_ID`
 
 ![Screenshot](examples/basic_transaction.png)
