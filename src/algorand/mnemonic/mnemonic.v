@@ -17,8 +17,8 @@ const (
 
 fn init() {
 	// Verify expected relationship between constants
-	if mnemonic.mnemonic_len_words * mnemonic.bits_per_word - mnemonic.checksum_len_bits !=
-		mnemonic.key_len_bytes * 8 + mnemonic.padding_zeros {
+	if mnemonic_len_words * bits_per_word - checksum_len_bits !=
+		key_len_bytes * 8 + padding_zeros {
 		panic('cannot initialize passphrase library: invalid constants')
 	}
 }
@@ -28,7 +28,7 @@ fn init() {
 // of data, and the last 11 bits are reserved for the checksum.
 fn from_key(key []u8) ?string {
 	// Ensure the key we are passed is the expected length
-	if key.len != mnemonic.key_len_bytes {
+	if key.len != key_len_bytes {
 		return err_wrong_key_len
 	}
 
@@ -47,7 +47,7 @@ fn from_key(key []u8) ?string {
 fn to_key(mnemonic string) ?[]u8 {
 	// Split input on whitespace
 	// words_raw := strings.Split(mnemonic, sep_str)
-	words_raw := mnemonic.split(mnemonic.sep_str)
+	words_raw := mnemonic.split(sep_str)
 
 	// Strip out extra whitespace
 	mut words := []string{}
@@ -59,7 +59,7 @@ fn to_key(mnemonic string) ?[]u8 {
 	}
 
 	// Ensure the mnemonic is the correct length
-	if words.len != mnemonic.mnemonic_len_words {
+	if words.len != mnemonic_len_words {
 		return err_wrong_mnemonic_len
 	}
 
@@ -87,17 +87,17 @@ fn to_key(mnemonic string) ?[]u8 {
 	// While converting back to byte array, our new 264 bits array is divisible by 8 but the last byte is just the padding.
 
 	// Check that we have 33 bytes long array as expected
-	if byte_arr.len != mnemonic.key_len_bytes + 1 {
+	if byte_arr.len != key_len_bytes + 1 {
 		return err_wrong_key_len
 	}
 	// Check that the last one is actually 0
-	if byte_arr[mnemonic.key_len_bytes] != mnemonic.empty_byte {
+	if byte_arr[key_len_bytes] != empty_byte {
 		return err_wrong_checksum
 	}
 
 	// chop it !
 	// byte_arr = byte_arr[0:key_len_bytes]
-	byte_arr = byte_arr[..mnemonic.key_len_bytes]
+	byte_arr = byte_arr[..key_len_bytes]
 
 	// Pull out the checksum
 	mnemonic_checksum := checksum(byte_arr)
@@ -108,7 +108,7 @@ fn to_key(mnemonic string) ?[]u8 {
 	}
 
 	// Verify that we recovered the correct amount of data
-	if byte_arr.len != mnemonic.key_len_bytes {
+	if byte_arr.len != key_len_bytes {
 		panic('passphrase:Mnemonicto_key is broken: recovered wrong amount of data')
 	}
 
