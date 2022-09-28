@@ -27,9 +27,13 @@ examples/example1.v demonstrates creating a new account (wallet & mnemonic) and 
  - Symlink the algorand module to `~/.vmodules`: `ln -s /full/path/to/algorand/src/algorand ~/.vmodules/algorand` 
  - Build custom v version to run demo (these changes are not in master yet, but will be soon after some fixes):
     * `git clone https://github.com/joe-conigliaro/v algorand_v`
-    * `git checkout comptime_selector_generic_call`
     * `cd algorand_v`
+    * `git checkout comptime_selector_generic_call`
     * `v -cg -o algorand_v cmd/v`
  - You can now use algorand_v to run examples/example1.v:
-    * Run the example, it will walk you through submitting a transaction `./algorand_v ../algorand/examples/example1.v`
+    * Running it will walk you through submitting a transaction `./algorand_v ../algorand/examples/example1.v`
     * Verify the transaction was submitted to testnet `https://testnet.algoexplorer.io/tx/TRANSACTION_ID`
+
+# Status
+
+There are currently a lot of warnings printed, and features that are not implemented yet. Rest assured this is being actively developed.
