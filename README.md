@@ -15,7 +15,8 @@ Additional developer documentation and examples can be found on [developer.algor
 
 # Examples
 
-examples/example1.v demonstrates creating a new account (wallet & mnemonic) and submitting a transaction to the Algorand testnet
+## examples/basic_transaction.v
+demonstrates creating a new account (wallet & mnemonic) and submitting a transaction to the Algorand testnet
 
  - Setup an Algorand node (https://developer.algorand.org/docs/run-a-node/setup/install/)
  - You will choose a data directory when installing the default is `~/.algorand`
@@ -30,9 +31,11 @@ examples/example1.v demonstrates creating a new account (wallet & mnemonic) and 
     * `cd algorand_v`
     * `git checkout comptime_selector_generic_call`
     * `v -cg -o algorand_v cmd/v`
- - You can now use algorand_v to run examples/example1.v:
-    * Running it will walk you through submitting a transaction `./algorand_v ../algorand/examples/example1.v`
+ - You can now use algorand_v to run examples/basic_transaction.v:
+    * Running it will walk you through submitting a transaction `./algorand_v ../algorand/examples/basic_transaction.v`
     * Verify the transaction was submitted to testnet `https://testnet.algoexplorer.io/tx/TRANSACTION_ID`
+
+![Screenshot](examples/basic_transaction.png)
 
 # Status
 

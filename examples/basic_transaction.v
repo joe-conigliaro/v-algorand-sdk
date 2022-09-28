@@ -13,7 +13,7 @@ fn main() {
 	mut readline := readline.Readline{}
 
 	algod_address := 'http://localhost:8080'
-	algod_token := 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+	algod_token := 'c9691b1659e9b996fb115bf19736f81d67a5de30c8be391fae5f35d3bfecf87e'
 
 	account := crypto.generate_account()
 	mnemonic := mnemonic.from_private_key(account.private_key) or {
