@@ -1,6 +1,6 @@
 module algod
 
-import v2.common
+// import v2.common
 
 // HealthCheck returns OK if healthy.
 struct HealthCheck {

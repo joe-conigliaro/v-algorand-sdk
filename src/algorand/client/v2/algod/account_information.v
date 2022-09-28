@@ -1,27 +1,24 @@
 module algod
 
 import context
-import v2.common
-import algorand.client.v2.common.models
-import strconv
+import client.v2.common
+import client.v2.common.models
 
 // AccountInformationParams contains all of the query parameters for url serialization.
 struct AccountInformationParams {
-
 	// Exclude when set to `all` will exclude asset holdings, application local state,
 	// created asset parameters, any created application parameters. Defaults to
 	// `none`.
-	exclude string [url:'exclude,omitempty']
+	exclude string [url: 'exclude,omitempty']
 
 	// Format configures whether the response object is JSON or MessagePack encoded.
-	format string [url:'format,omitempty']
+	format string [url: 'format,omitempty']
 }
 
 // AccountInformation given a specific account public key, this call returns the
 // accounts status, balance and spendable amounts
 struct AccountInformation {
 	// c *Client
-
 	address string
 
 	p AccountInformationParams
@@ -43,13 +40,14 @@ struct AccountInformation {
 
 pub fn (mut c Client) get_account_information(ctx context.Context, address string, headers ...&common.Header) ?models.Account {
 	// resp := c.get(ctx, '/v2/address/params/' + common.escape_params(address), [], [])?
-	escaped := common.escape_params(address)
+	// TODO: escape
+	// escaped := common.escape_params(address)
 	resp := c.get(ctx, '/v2/accounts/' + address, unsafe { nil }, [])?
 	// println('get_account_information resp: $resp')
 	// TODO: automatic decode to structure
 	return models.Account{
-		address: resp['address'].str() // eiiip
-		amount: resp['amount'].u64()
+		address: resp['address'] or { 'missing' }.str() // eiiip
+		amount: resp['amount'] or { 0 }.u64()
 		// TODO: all fields
 	}
 }

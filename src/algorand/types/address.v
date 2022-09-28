@@ -23,8 +23,8 @@ pub fn new_address_from_u8_array(a []u8) Address {
 
 // TODO
 pub fn new_address() Address {
-// pub fn new_address() []u8 {
-	return []u8{len: hash_len_bytes}
+	// pub fn new_address() []u8 {
+	return []u8{len: types.hash_len_bytes}
 }
 
 // String grabs a human-readable representation of the address. This
@@ -34,13 +34,13 @@ pub fn (a Address) str() string {
 	// Compute the checksum
 	// checksum_hash := sha512.Sum512_256(a[:])
 	checksum_hash := sha512.sum512_256(a)
-	checksum_len_bytes_ := checksum_hash[hash_len_bytes-checksum_len_bytes..]
+	checksum_len_bytes_ := checksum_hash[types.hash_len_bytes - types.checksum_len_bytes..]
 
 	// Append the checksum and encode as base32
 	// checksum_address := append(a[:], checksum_len_bytes...)
 	mut checksum_address := a.clone()
 	checksum_address << checksum_len_bytes_
-	
+
 	// encoded_addr := base32.new_std_encoding_with_padding(base32.no_padding).encode_to_string(checksum_address)
 	// println(checksum_address.bytestr())
 	// println('# checksum_address len: $checksum_address.len')
@@ -50,14 +50,14 @@ pub fn (a Address) str() string {
 }
 
 // zero_address is Address with all zero bytes. For handy == != comparisons.
-const(
+const (
 	// zero_address Address = [hash_len_bytes]byte{}
 	zero_address = new_address()
 )
 
 // is_zero returs true if the Address is all zero bytes.
 fn (a Address) is_zero() bool {
-	return a == zero_address
+	return a == types.zero_address
 }
 
 // decode_address turns a checksum address string into an Address object. It
@@ -69,19 +69,19 @@ pub fn decode_address(addr string) ?Address {
 
 	// Ensure the decoded address is the correct length
 	// if decoded.len != a.len+checksum_len_bytes {
-	if decoded.len != hash_len_bytes+checksum_len_bytes {
-		return errWrongAddressLen
+	if decoded.len != types.hash_len_bytes + types.checksum_len_bytes {
+		return err_wrong_address_len
 	}
 
 	// Split into address + checksum
 	// address_bytes := decoded[..a.len]
 	// checksum_bytes := decoded[a.len..]
-	address_bytes := decoded[..hash_len_bytes]
-	checksum_bytes := decoded[hash_len_bytes..]
+	address_bytes := decoded[..types.hash_len_bytes]
+	checksum_bytes := decoded[types.hash_len_bytes..]
 
 	// Compute the expected checksum
 	checksum_hash := sha512.sum512_256(address_bytes)
-	expected_checksum_bytes := checksum_hash[hash_len_bytes-checksum_len_bytes..]
+	expected_checksum_bytes := checksum_hash[types.hash_len_bytes - types.checksum_len_bytes..]
 
 	// println('address_bytes.len: $address_bytes.len')
 	// println('address_bytes: $address_bytes')
@@ -94,7 +94,7 @@ pub fn decode_address(addr string) ?Address {
 	// Check the checksum
 	// if !bytes.Equal(expected_checksum_bytes, checksum_bytes) {
 	if expected_checksum_bytes != checksum_bytes {
-		return errWrongChecksum
+		return err_wrong_checksum
 	}
 
 	// Checksum is good, copy address bytes into output
@@ -105,8 +105,8 @@ pub fn decode_address(addr string) ?Address {
 // encode_address turns a byte slice into the human readable representation of the address.
 // This representation includes a 4-byte checksum
 fn encode_address(addr []byte) ?string {
-	if addr.len != hash_len_bytes {
-		return errWrongAddressByteLen
+	if addr.len != types.hash_len_bytes {
+		return err_wrong_address_byte_len
 	}
 
 	// address := Address{}

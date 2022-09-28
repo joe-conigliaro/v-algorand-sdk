@@ -1,37 +1,36 @@
 module crypto2
 
-// import bytes
-import crypto.rand
+// import crypto.rand
 import crypto.sha512
 import crypto.ed25519
 import encoding.base32
-import encoding.base64
+// import encoding.base64
 import encoding.binary
+import algorand.types
 // import encoding.msgpack
 import msgpack
-import algorand.types
 
-const(
+const (
 	// txid_prefix is prepended to a transaction when computing its txid
-	txid_prefix = 'TX'.bytes()
+	txid_prefix         = 'TX'.bytes()
 
 	// tgid_prefix is prepended to a transaction group when computing the group ID
-	tgid_prefix = 'TG'.bytes()
+	tgid_prefix         = 'TG'.bytes()
 
 	// bid_prefix is prepended to a bid when signing it
-	bid_prefix = 'aB'.bytes()
+	bid_prefix          = 'aB'.bytes()
 
 	// bytes_prefix is prepended to a message when signing
-	bytes_prefix = 'MX'.bytes()
+	bytes_prefix        = 'MX'.bytes()
 
 	// program_prefix is prepended to a logic program when computing a hash
-	program_prefix = 'Program'.bytes()
+	program_prefix      = 'Program'.bytes()
 
 	// program_data_prefix is prepended to teal sign data
 	program_data_prefix = 'ProgData'.bytes()
 
 	// app_id_prefix is prepended to application IDs in order to compute addresses
-	app_id_prefix = 'appID'.bytes()
+	app_id_prefix       = 'appID'.bytes()
 )
 
 // RandomBytes fills the passed slice with randomness, and panics if it is
@@ -73,8 +72,8 @@ pub fn sign_transaction(sk ed25519.PrivateKey, tx types.Transaction) ?(string, [
 
 	// Construct the SignedTxn
 	mut stx := types.SignedTxn{
-		sig: s,
-		txn: tx,
+		sig: s
+		txn: tx
 	}
 
 	a := generate_address_from_sk(sk)?
@@ -102,13 +101,13 @@ fn raw_transaction_bytes_to_sign(tx types.Transaction) []u8 {
 	// Prepend the hashable prefix
 	// msg_parts := [][]byte{txid_prefix, encoded_tx}
 	// return bytes.Join(msgParts, nil)
-	mut b := txid_prefix.clone()
+	mut b := crypto2.txid_prefix.clone()
 	b << encoded_tx
 	return b
 }
 
 // tx_id_from_raw_txn_bytes_to_sign computes a transaction id base32 string from raw transaction bytes
-fn tx_id_from_raw_txn_bytes_to_sign(to_be_signed []u8) (string) {
+fn tx_id_from_raw_txn_bytes_to_sign(to_be_signed []u8) string {
 	tx_id_bytes := sha512.sum512_256(to_be_signed)
 	// return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(txidBytes[:])
 	return base32.new_std_encoding_with_padding(base32.no_padding).encode_to_string(tx_id_bytes)
@@ -149,7 +148,7 @@ fn raw_sign_transaction(sk ed25519.PrivateKey, tx types.Transaction) ?(types.Sig
 	// n := copy(s[:], signature)
 	// if n != s.len {
 	if signature.len != s.len {
-		return errInvalidSignatureReturned
+		return err_invalid_signature_returned
 	}
 	// Populate tx_id
 	tx_id := tx_id_from_raw_txn_bytes_to_sign(to_be_signed)
@@ -160,7 +159,7 @@ fn raw_sign_transaction(sk ed25519.PrivateKey, tx types.Transaction) ?(types.Sig
 fn sign_bytes(sk ed25519.PrivateKey, bytes_to_sign []u8) ?[]u8 {
 	// prepend the prefix for signing bytes
 	// to_be_signed := bytes.Join([][]u8{bytes_prefix, bytes_to_sign}, nil)
-	mut to_be_signed := bytes_prefix.clone()
+	mut to_be_signed := crypto2.bytes_prefix.clone()
 	to_be_signed << bytes_to_sign
 
 	// sign the bytes
@@ -171,9 +170,9 @@ fn sign_bytes(sk ed25519.PrivateKey, bytes_to_sign []u8) ?[]u8 {
 fn verify_bytes(pk ed25519.PublicKey, message []u8, signature []u8) bool {
 	// msg_parts := [][]byte{bytes_prefix, message}
 	// to_be_verified := bytes.Join(msg_parts, nil)
-	mut to_be_verified := bytes_prefix.clone()
+	mut to_be_verified := crypto2.bytes_prefix.clone()
 	to_be_verified << message
-	// return ed25519.verify(pk, to_be_verified, signature) or { 
+	// return ed25519.verify(pk, to_be_verified, signature) or {
 	// 	false
 	// }
 	if res := ed25519.verify(pk, to_be_verified, signature) {
@@ -191,7 +190,7 @@ fn sign_bid(sk ed25519.PrivateKey, bid types.Bid) ?[]u8 {
 	// Prepend the hashable prefix
 	// msg_parts := [][]byte{bid_prefix, encoded_bid}
 	// toBeSigned := bytes.Join(msg_parts, nil)
-	mut to_be_signed := bid_prefix.clone()
+	mut to_be_signed := crypto2.bid_prefix.clone()
 	to_be_signed << encoded_bid
 
 	// Sign the encoded bid
@@ -202,26 +201,26 @@ fn sign_bid(sk ed25519.PrivateKey, bid types.Bid) ?[]u8 {
 	// n := copy(s[:], sig)
 	// if n != s.len {
 	if sig.len != s.len {
-		return errInvalidSignatureReturned
+		return err_invalid_signature_returned
 	}
 
 	sb := types.SignedBid{
-		bid: bid,
-		sig: s,
+		bid: bid
+		sig: s
 	}
 
 	nf := types.NoteField{
-		type_:      types.note_bid,
-		signed_bid: sb,
+		type_: types.note_bid
+		signed_bid: sb
 	}
 
 	return msgpack.encode(nf)
 }
 
-/* Multisig Support */
+// Multisig Support
 
 // type signer func() (signature types.Signature, err error)
-type Signer = fn() ?types.Signature
+type Signer = fn () ?types.Signature
 
 // Service function to make a single signature in Multisig
 fn multisig_single(sk ed25519.PrivateKey, ma MultisigAccount, custom_signer Signer) ?(types.MultisigSig, int) {
@@ -236,7 +235,7 @@ fn multisig_single(sk ed25519.PrivateKey, ma MultisigAccount, custom_signer Sign
 		}
 	}
 	if my_index == ma.pks.len {
-		return errMsigInvalidSecretKey
+		return err_msig_invalid_secret_key
 	}
 
 	// now, create the signed transaction
@@ -276,6 +275,7 @@ fn sign_multisig_transaction(sk ed25519.PrivateKey, ma MultisigAccount, tx types
 	custom_signer := fn [sk, tx, mut txid] () ?types.Signature {
 		raw_sig, txid2 := raw_sign_transaction(sk, tx)?
 		txid = txid2
+		_ = txid // clear warning
 		return raw_sig
 	}
 	// TODO: closure vars
@@ -283,8 +283,8 @@ fn sign_multisig_transaction(sk ed25519.PrivateKey, ma MultisigAccount, tx types
 
 	// Encode the signedTxn
 	mut stx := types.SignedTxn{
-		msig: sig,
-		txn:  tx,
+		msig: sig
+		txn: tx
 	}
 
 	ma_address := ma.address()?
@@ -301,7 +301,7 @@ fn sign_multisig_transaction(sk ed25519.PrivateKey, ma MultisigAccount, tx types
 // returns an encoded signed multisig transaction with the component signatures.
 fn merge_multisig_transactions(stxs_bytes ...[]u8) ?(string, []u8) {
 	if stxs_bytes.len < 2 {
-		return errMsigMergeLessThanTwo
+		return err_msig_merge_less_than_two
 	}
 	// var sig types.MultisigSig
 	// var refAddr *types.Address
@@ -343,11 +343,11 @@ fn merge_multisig_transactions(stxs_bytes ...[]u8) ?(string, []u8) {
 		// if partAddr != *ref_addr {
 		// TODO: ?
 		if part_addr != ref_addr {
-			return errMsigMergeKeysMismatch
+			return err_msig_merge_keys_mismatch
 		}
 
 		if part_stx.auth_addr != ref_auth_addr {
-			return errMsigMergeAuthAddrMismatch
+			return err_msig_merge_auth_addr_mismatch
 		}
 
 		// now, add subsignatures appropriately
@@ -358,16 +358,16 @@ fn merge_multisig_transactions(stxs_bytes ...[]u8) ?(string, []u8) {
 				if sig.subsigs[i].sig == types.zero_signature {
 					sig.subsigs[i].sig = m_subsig.sig
 				} else if sig.subsigs[i].sig != m_subsig.sig {
-					return errMsigMergeInvalidDups
+					return err_msig_merge_invalid_dups
 				}
 			}
 		}
 	}
 	// Encode the signedTxn
 	stx := types.SignedTxn{
-		msig:      sig,
-		txn:       ref_tx,
-		auth_addr: ref_auth_addr,
+		msig: sig
+		txn: ref_tx
+		auth_addr: ref_auth_addr
 	}
 	stx_bytes := msgpack.encode(stx)
 	// let's also compute the txid.
@@ -403,7 +403,9 @@ fn verify_multisig(addr types.Address, message []u8, msig types.MultisigSig) boo
 	// 	return false
 	// }
 	msig_address := msig_account.address() or { return false }
-	if msig_address != addr { return false }
+	if msig_address != addr {
+		return false
+	}
 
 	// check that we don't have too many multisig subsigs
 	if msig.subsigs.len > 255 {
@@ -433,9 +435,7 @@ fn verify_multisig(addr types.Address, message []u8, msig types.MultisigSig) boo
 		// if (subsigi.sig != types.Signature{}) {
 		if subsigi.sig != types.zero_signature {
 			// if !ed25519.verify(subsigi.Key, message, subsigi.Sig[:]) {
-			ed25519.verify(subsigi.key, message, subsigi.sig) or {
-				return false
-			}
+			ed25519.verify(subsigi.key, message, subsigi.sig) or { return false }
 			verified_count++
 		}
 	}
@@ -472,12 +472,12 @@ fn compute_group_id(txgroup []types.Transaction) ?types.Digest {
 	// Prepend the hashable prefix and hash it
 	// msg_parts := [][]u8{tgid_prefix, encoded}
 	// return sha512.Sum512_256(bytes.Join(msg_parts, nil)), nil
-	mut msg_parts := tgid_prefix.clone()
+	mut msg_parts := crypto2.tgid_prefix.clone()
 	msg_parts << encoded
 	return sha512.sum512_256(msg_parts)
 }
 
-/* LogicSig support */
+// LogicSig support
 
 fn is_ascii_printable_byte(symbol u8) bool {
 	is_break_line := symbol == `\n`
@@ -524,9 +524,7 @@ fn sanity_check_program(program []u8) ? {
 // multsig account). In that case, it should be the address of the delegating
 // account.
 fn verify_logic_sig(lsig types.LogicSig, single_signer types.Address) bool {
-	sanity_check_program(lsig.logic) or {
-		return false
-	}
+	sanity_check_program(lsig.logic) or { return false }
 
 	// has_sig := lsig.sig != (types.Signature{})
 	has_sig := lsig.sig != types.zero_signature
@@ -558,16 +556,15 @@ fn verify_logic_sig(lsig types.LogicSig, single_signer types.Address) bool {
 //
 // lsig_address is the address of the account that the LogicSig represents.
 fn sign_logic_sig_transaction_with_address(lsig types.LogicSig, lsig_address types.Address, tx types.Transaction) ?(string, []u8) {
-
 	if !verify_logic_sig(lsig, lsig_address) {
-		return errLsigInvalidSignature
+		return err_lsig_invalid_signature
 	}
 
 	txid := tx_id_from_transaction(tx)
 	// Construct the SignedTxn
 	mut stx := types.SignedTxn{
-		lsig: lsig,
-		txn:  tx,
+		lsig: lsig
+		txn: tx
 	}
 
 	if stx.txn.sender != lsig_address {
@@ -624,7 +621,7 @@ fn sign_logic_sig_transaction(lsig types.LogicSig, tx types.Transaction) ?(strin
 fn program_to_sign(program []u8) []u8 {
 	// parts := [][]u8{program_prefix, program}
 	// to_be_signed := bytes.Join(parts, nil)
-	mut to_be_signed := program_prefix.clone()
+	mut to_be_signed := crypto2.program_prefix.clone()
 	to_be_signed << program
 	return to_be_signed
 }
@@ -637,7 +634,7 @@ fn sign_program(sk ed25519.PrivateKey, program []u8) ?types.Signature {
 	// n := copy(sig[:], raw_sig)
 	n := copy(mut sig, raw_sig)
 	if n != sig.len {
-		return errInvalidSignatureReturned
+		return err_invalid_signature_returned
 	}
 	return sig
 }
@@ -662,7 +659,7 @@ fn address_from_program(program []u8) types.Address {
 // 3. If both sk and ma specified the function returns Multisig delegated LogicSig
 fn make_logic_sig(program []u8, args [][]u8, sk ed25519.PrivateKey, ma MultisigAccount) ?types.LogicSig {
 	sanity_check_program(program)?
-	
+
 	mut lsig := types.LogicSig{}
 	// if sk == nil && ma.blank() {
 	// TODO: fix nil
@@ -701,7 +698,7 @@ fn make_logic_sig(program []u8, args [][]u8, sk ed25519.PrivateKey, ma MultisigA
 // append_multisig_to_logic_sig adds a new signature to multisigned LogicSig
 fn append_multisig_to_logic_sig(mut lsig types.LogicSig, sk ed25519.PrivateKey) ? {
 	if lsig.msig.blank() {
-		return errLsigEmptyMsig
+		return err_lsig_empty_msig
 	}
 
 	ma := multisig_account_from_sig(lsig.msig)?
@@ -722,7 +719,7 @@ fn append_multisig_to_logic_sig(mut lsig types.LogicSig, sk ed25519.PrivateKey) 
 fn teal_sign(sk ed25519.PrivateKey, data []u8, contract_address types.Address) ?types.Signature {
 	// msg_parts := [][]u8{program_data_prefix, contract_address[:], data}
 	// to_be_signed := bytes.Join(msg_parts, nil)
-	mut to_be_signed := program_data_prefix.clone()
+	mut to_be_signed := crypto2.program_data_prefix.clone()
 	to_be_signed << contract_address
 	to_be_signed << data
 
@@ -734,7 +731,7 @@ fn teal_sign(sk ed25519.PrivateKey, data []u8, contract_address types.Address) ?
 	raw_sig := signature.clone()
 	// if n != raw_sig.len {
 	if raw_sig.len != signature.len {
-		return errInvalidSignatureReturned
+		return err_invalid_signature_returned
 	}
 	return raw_sig
 }
@@ -749,7 +746,7 @@ fn teal_sign_from_program(sk ed25519.PrivateKey, data []u8, program []u8) ?types
 fn teal_verify(pk ed25519.PublicKey, data []u8, contract_address types.Address, raw_sig types.Signature) bool {
 	// msg_parts := [][]u8{program_data_prefix, contract_address[:], data}
 	// to_be_verified := bytes.Join(msg_parts, nil)
-	mut to_be_verified := program_data_prefix.clone()
+	mut to_be_verified := crypto2.program_data_prefix.clone()
 	to_be_verified << contract_address
 	to_be_verified << data
 
@@ -764,7 +761,7 @@ fn get_application_address(app_id u64) types.Address {
 
 	// parts := [][]u8{app_id_prefix, encoded_app_id}
 	// to_be_hashed := bytes.Join(parts, nil)
-	mut to_be_hashed := app_id_prefix.clone()
+	mut to_be_hashed := crypto2.app_id_prefix.clone()
 	to_be_hashed << encoded_app_id
 
 	hash := sha512.sum512_256(to_be_hashed)

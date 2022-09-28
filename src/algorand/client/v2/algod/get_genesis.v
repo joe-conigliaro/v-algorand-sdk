@@ -1,6 +1,6 @@
 module algod
 
-import v2.common
+// import v2.common
 
 // GetGenesis returns the entire genesis file in json.
 struct GetGenesis {

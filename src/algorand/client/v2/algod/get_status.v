@@ -1,9 +1,8 @@
 module algod
 
-import context
-import algorand.client.v2.common
-import algorand.client.v2.common.models
-
+// import context
+// import algorand.client.v2.common
+// import algorand.client.v2.common.models
 
 // Status gets the current node status.
 // type Status struct {

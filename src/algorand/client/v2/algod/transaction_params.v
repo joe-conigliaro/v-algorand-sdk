@@ -1,15 +1,11 @@
 module algod
 
 import context
-// import client.v2.common
 import types
-import client.v2.common.models
-import x.json2
+// import client.v2.common
+// import client.v2.common.models
+// import x.json2
 import encoding.base64
-// "github.com/algorand/go-algorand-sdk/client/v2/common"
-// "github.com/algorand/go-algorand-sdk/client/v2/common/models"
-// "github.com/algorand/go-algorand-sdk/types"
-
 
 // SuggestedParams get parameters for constructing a new transaction
 // struct SuggestedParams {
@@ -17,16 +13,16 @@ import encoding.base64
 // }
 
 pub fn (mut c Client) get_suggested_params(ctx context.Context) ?types.SuggestedParams {
-	resp := c.get(ctx, "/v2/transactions/params", unsafe { nil }, [])?
+	resp := c.get(ctx, '/v2/transactions/params', unsafe { nil }, [])?
 	// TODO automatic decode
 	return types.SuggestedParams{
-		fee: types.MicroAlgos(resp['fee'].u64())
-		genesis_id: resp['genesis-id'].str()
-		genesis_hash: base64.decode(resp['genesis-hash'].str()) // eiip
-		first_round_valid: types.Round(resp['last-round'].u64())
-		last_round_valid: types.Round(resp['last-round'].u64() + 1000)
-		consensus_version: resp['consensus-version'].str()
-		min_fee: resp['min-fee'].u64()
+		fee: types.MicroAlgos(resp['fee'] or { 0 }.u64())
+		genesis_id: resp['genesis-id'] or { 'missing' }.str()
+		genesis_hash: base64.decode(resp['genesis-hash'] or { 'missing' }.str()) // eiip
+		first_round_valid: types.Round(resp['last-round'] or { 0 }.u64())
+		last_round_valid: types.Round(resp['last-round'] or { 0 }.u64() + 1000)
+		consensus_version: resp['consensus-version'] or { 'missing' }.str()
+		min_fee: resp['min-fee'] or { 0 }.u64()
 	}
 }
 

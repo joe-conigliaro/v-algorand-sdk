@@ -28,9 +28,7 @@ fn init() {
 // generate_account generates a random Account
 pub fn generate_account() Account {
 	// Generate an ed25519 keypair. This should never fail
-	pk, sk := ed25519.generate_key() or {
-		panic(err)
-	}
+	pk, sk := ed25519.generate_key() or { panic(err) }
 
 	// Convert the public key to an address
 	// mut a := types.Address{}
@@ -43,8 +41,8 @@ pub fn generate_account() Account {
 
 	// Build the account
 	return Account{
-		public_key: pk,
-		private_key: sk,
+		public_key: pk
+		private_key: sk
 		address: a
 	}
 }
@@ -54,7 +52,7 @@ pub fn generate_account() Account {
 // ed25519.private_key_size.
 fn account_from_private_key(sk ed25519.PrivateKey) ?Account {
 	if sk.len != ed25519.private_key_size {
-		return errInvalidPrivateKey
+		return err_invalid_private_key
 	}
 
 	mut account := Account{}
@@ -73,7 +71,7 @@ fn account_from_private_key(sk ed25519.PrivateKey) ?Account {
 	return account
 }
 
-/* Multisig Support */
+// Multisig Support
 
 // MultisigAccount is a convenience type for holding multisig preimage data
 struct MultisigAccount {
@@ -124,7 +122,7 @@ fn (ma MultisigAccount) address() ?types.Address {
 	// See go-algorand/crypto/multisig.go
 	ma.validate()?
 	// buffer := append([]byte(msig_add_prefix), byte(ma.version), byte(ma.threshold))
-	mut buffer := msig_add_prefix.bytes()
+	mut buffer := crypto2.msig_add_prefix.bytes()
 	buffer << ma.version
 	buffer << ma.threshold
 	for pki in ma.pks {
@@ -137,10 +135,10 @@ fn (ma MultisigAccount) address() ?types.Address {
 // validate ensures that this multisig setup is a valid multisig account
 fn (ma MultisigAccount) validate() ? {
 	if ma.version != 1 {
-		return errMsigUnknownVersion
+		return err_msig_unknown_version
 	}
 	if ma.threshold == 0 || ma.pks.len == 0 || int(ma.threshold) > ma.pks.len {
-		return errMsigInvalidThreshold
+		return err_msig_invalid_threshold
 	}
 	return
 }
@@ -161,7 +159,7 @@ fn (ma MultisigAccount) blank() bool {
 	return true
 }
 
-/* LogicSig support */
+// LogicSig support
 
 // logic_sig_address returns the contract (escrow) address for a LogicSig.
 //
@@ -185,12 +183,11 @@ fn logic_sig_address(lsig types.LogicSig) types.Address {
 struct LogicSigAccount {
 mut:
 	// struct_ struct{} 			  [codec:',omitempty,omitemptyarray']
-
 	// The underlying LogicSig object
-	lsig types.LogicSig 		  [codec:'lsig']
+	lsig types.LogicSig [codec: 'lsig']
 
 	// The key that provided Lsig.sig, if any
-	signing_key ed25519.PublicKey [codec:'sigkey']
+	signing_key ed25519.PublicKey [codec: 'sigkey']
 }
 
 // make_logic_sig_account_escrow creates a new escrow LogicSigAccount. The address
@@ -200,9 +197,9 @@ mut:
 fn make_logic_sig_account_escrow(program []u8, args [][]u8) LogicSigAccount {
 	return LogicSigAccount{
 		lsig: types.LogicSig{
-			logic: program,
-			args:  args,
-		},
+			logic: program
+			args: args
+		}
 	}
 }
 
@@ -212,7 +209,9 @@ fn make_logic_sig_account_escrow_checked(program []u8, args [][]u8) ?LogicSigAcc
 	// lsig := make_logic_sig(program, args, unsafe { nil }, MultisigAccount{})?
 	empty_priv_key := []u8{}
 	lsig := make_logic_sig(program, args, ed25519.PrivateKey(empty_priv_key), MultisigAccount{})?
-	return LogicSigAccount{lsig: lsig}
+	return LogicSigAccount{
+		lsig: lsig
+	}
 }
 
 // make_logic_sig_account_delegated creates a new delegated LogicSigAccount. This
@@ -228,9 +227,9 @@ fn make_logic_sig_account_delegated(program []u8, args [][]u8, signer ed25519.Pr
 	signer_account := account_from_private_key(signer)?
 
 	return LogicSigAccount{
-		lsig: lsig,
+		lsig: lsig
 		// attach SigningKey to remember which account the signature belongs to
-		signing_key: signer_account.public_key,
+		signing_key: signer_account.public_key
 	}
 }
 
@@ -248,7 +247,7 @@ fn make_logic_sig_account_delegated(program []u8, args [][]u8, signer ed25519.Pr
 fn make_logic_sig_account_delegated_msig(program []u8, args [][]u8, msigAccount MultisigAccount, signer ed25519.PrivateKey) ?LogicSigAccount {
 	lsig := make_logic_sig(program, args, signer, msigAccount)?
 	return LogicSigAccount{
-		lsig: lsig,
+		lsig: lsig
 		// do not attach SigningKey, since that doesn't apply to an msig signature
 	}
 }
@@ -276,21 +275,21 @@ fn logic_sig_account_from_logic_sig(lsig types.LogicSig, signer_public_key &ed25
 	has_msig := !lsig.msig.blank()
 
 	if has_sig && has_msig {
-		return errLsigTooManySignatures
+		return err_lsig_too_many_signatures
 	}
 
 	mut lsa := LogicSigAccount{}
 	if has_sig {
 		// if signer_public_key == unsafe { nil } {
 		if signer_public_key.len != 0 {
-			return errLsigNoPublicKey
+			return err_lsig_no_public_key
 		}
 
 		to_be_signed := program_to_sign(lsig.logic)
 		// valid := ed25519.verify(&signer_public_key, to_be_signed, lsig.sig[:])?
 		valid := ed25519.verify(*signer_public_key, to_be_signed, lsig.sig)?
 		if !valid {
-			return errLsigInvalidPublicKey
+			return err_lsig_invalid_public_key
 		}
 
 		lsa.lsig = lsig
@@ -302,7 +301,7 @@ fn logic_sig_account_from_logic_sig(lsig types.LogicSig, signer_public_key &ed25
 
 	// if signer_public_key != unsafe { nil } {
 	if signer_public_key.len != 0 {
-		return errLsigAccountPublicKeyNotNeeded
+		return err_lsig_account_public_key_not_needed
 	}
 
 	lsa.lsig = lsig
@@ -335,7 +334,7 @@ fn (lsa LogicSigAccount) address() ?types.Address {
 
 	// require at most one sig
 	if has_sig && has_msig {
-		return errLsigTooManySignatures
+		return err_lsig_too_many_signatures
 	}
 
 	// mut addr := types.Address

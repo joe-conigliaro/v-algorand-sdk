@@ -1,8 +1,8 @@
 module types
 
 import msgpack
-import encoding.base64
-import algorand.types
+// import encoding.base64
+// import algorand.types
 
 // TODO: fix encoding of structs, so as not to need this manual encoding
 

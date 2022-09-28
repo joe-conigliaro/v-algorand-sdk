@@ -1,14 +1,14 @@
 module transaction
 
-import encoding.base64
+// import encoding.base64
 // import encoding.msgpack
 import msgpack
-import algorand.crypto2 as crypto
+// import algorand.crypto2 as crypto
 import algorand.types
 
-pub const(
+pub const (
 	// min_txn_fee is v5 consensus params, in microAlgos
-	min_txn_fee = 1000
+	min_txn_fee                           = 1000
 
 	// num_of_additional_bytes_after_signing is the number of bytes added to a txn after signing it
 	num_of_additional_bytes_after_signing = 75
@@ -43,29 +43,29 @@ pub fn make_payment_txn(from string, to string, fee u64, amount u64, first_round
 
 	// Build the transaction
 	mut tx := types.Transaction{
-		type_: types.payment_tx,
+		type_: types.payment_tx
 		Header: types.Header{
-			sender:       from_addr,
-			fee:          types.MicroAlgos(fee),
-			first_valid:  types.Round(first_round),
-			last_valid:   types.Round(last_round),
-			note:         note,
-			genesis_id:   genesis_id,
-			genesis_hash: gh,
-		},
+			sender: from_addr
+			fee: types.MicroAlgos(fee)
+			first_valid: types.Round(first_round)
+			last_valid: types.Round(last_round)
+			note: note
+			genesis_id: genesis_id
+			genesis_hash: gh
+		}
 		PaymentTxnFields: types.PaymentTxnFields{
-			receiver:           to_addr,
-			amount:             types.MicroAlgos(amount),
-			close_remainder_to: close_remainder_to_addr,
-		},
+			receiver: to_addr
+			amount: types.MicroAlgos(amount)
+			close_remainder_to: close_remainder_to_addr
+		}
 	}
 
 	// Update fee
 	e_size := estimate_size(tx)?
 	tx.fee = types.MicroAlgos(e_size * fee)
 
-	if tx.fee < min_txn_fee {
-		tx.fee = min_txn_fee
+	if tx.fee < transaction.min_txn_fee {
+		tx.fee = transaction.min_txn_fee
 	}
 
 	return tx
@@ -76,11 +76,12 @@ pub fn make_payment_txn(from string, to string, fee u64, amount u64, first_round
 // fee is a flat fee
 // Deprecated: next major version will use a Params object, see package future
 pub fn make_payment_txn_with_flat_fee(from string, to string, fee u64, amount u64, first_round u64, last_round u64, note []u8, close_remainder_to string, genesis_id string, genesis_hash []u8) ?types.Transaction {
-	mut tx := make_payment_txn(from, to, fee, amount, first_round, last_round, note, close_remainder_to, genesis_id, genesis_hash)?
+	mut tx := make_payment_txn(from, to, fee, amount, first_round, last_round, note, close_remainder_to,
+		genesis_id, genesis_hash)?
 	tx.fee = types.MicroAlgos(fee)
 
-	if tx.fee < min_txn_fee {
-		tx.fee = min_txn_fee
+	if tx.fee < transaction.min_txn_fee {
+		tx.fee = transaction.min_txn_fee
 	}
 
 	return tx
@@ -776,7 +777,7 @@ pub fn make_payment_txn_with_flat_fee(from string, to string, fee u64, amount u6
 
 // EstimateSize returns the estimated length of the encoded transaction
 fn estimate_size(txn types.Transaction) ?u64 {
-	return u64(msgpack.encode(txn).len) + num_of_additional_bytes_after_signing
+	return u64(msgpack.encode(txn).len) + transaction.num_of_additional_bytes_after_signing
 }
 
 // // byte32FromBase64 decodes the input base64 string and outputs a

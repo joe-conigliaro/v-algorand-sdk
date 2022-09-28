@@ -1,46 +1,39 @@
 module types
 
-// import
-// 	'encoding/base64'
-// 	'math'
-
-// 	'github.com/algorand/go-algorand-sdk/encoding/msgpack'
-
-// 	'golang.org/x/crypto/ed25519'
-// )
-import encoding.base64
-import crypto.ed25519
+// import math
+// import encoding.base64
+// import encoding.msgpack
+// import crypto.ed25519
 
 // TxType identifies the type of the transaction
 pub type TxType = string
 
 pub const (
 	// payment_tx is the TxType for payment transactions
-	payment_tx = TxType('pay')
+	payment_tx          = TxType('pay')
 	// key_registration_tx is the TxType for key registration transactions
 	key_registration_tx = TxType('keyreg')
 	// asset_config_tx creates, re-configures, or destroys an asset
-	asset_config_tx = TxType('acfg')
+	asset_config_tx     = TxType('acfg')
 	// asset_transfer_tx transfers assets between accounts (optionally closing)
-	asset_transfer_tx = TxType('axfer')
+	asset_transfer_tx   = TxType('axfer')
 	// asset_freeze_tx changes the freeze status of an asset
-	asset_freeze_tx = TxType('afrz')
+	asset_freeze_tx     = TxType('afrz')
 	// application_call_tx allows creating, deleting, and interacting with an application
 	application_call_tx = TxType('appl')
 )
 
-
-pub const(
+pub const (
 	master_derivation_key_len_bytes = 32
-	
+
 	// max_tx_group_size is max number of transactions in a single group
-	max_tx_group_size = 16
+	max_tx_group_size               = 16
 	// logic_sig_max_size is a max TEAL program size (with args)
-	logic_sig_max_size = 1000
+	logic_sig_max_size              = 1000
 	// logic_sig_max_cost is a max execution const of a TEAL program
-	logic_sig_max_cost = 20000
+	logic_sig_max_cost              = 20000
 	// key_store_root_size is the size, in bytes, of keyreg verifier
-	key_store_root_size = 64
+	key_store_root_size             = 64
 )
 
 // MicroAlgos are the base unit of currency in Algorand
@@ -61,7 +54,7 @@ type VRFPK = [32]u8
 // type MasterDerivationKey = [master_derivation_key_len_bytes]u8
 type MasterDerivationKey = []u8
 
-pub const(
+pub const (
 	zero_digest = new_digest()
 )
 

@@ -1,9 +1,7 @@
 module algod
 
 import context
-import net.http
-// import github.com.algorand.go-algorand-sdk.client.v2.common
-// import github.com.algorand.go-algorand-sdk.client.v2.common.models
+// import net.http
 import v2.common
 // import v2.common.models
 import x.json2
@@ -11,7 +9,7 @@ import x.json2
 const auth_header = 'X-Algo-API-Token'
 
 // type Client = common.Client
-struct Client{
+struct Client {
 pub mut:
 	c common.Client
 }
@@ -39,13 +37,13 @@ fn (mut c Client) post<T>(ctx_3 context.Context, path_3 string, params T, header
 
 // MakeClient is the factory for constructing a ClientV2 for a given endpo
 pub fn make_client(address string, apiToken string) ?&Client {
-	return &Client(common.make_client(address, auth_header, apiToken)?)
+	return &Client(common.make_client(address, algod.auth_header, apiToken)?)
 }
 
 // MakeClientWithHeaders is the factory for constructing a ClientV2 f
 pub fn make_client_with_headers(address_1 string, apiToken_1 string, headers_4 []&common.Header) ?&Client {
-	mut common_client_with_headers := common.make_client_with_headers(address_1,
-		algod.auth_header, apiToken_1, headers_4)?
+	mut common_client_with_headers := common.make_client_with_headers(address_1, algod.auth_header,
+		apiToken_1, headers_4)?
 	return &Client(common_client_with_headers)
 }
 
@@ -150,12 +148,12 @@ pub fn make_client_with_headers(address_1 string, apiToken_1 string, headers_4 [
 // 	}
 // }
 
-// pub fn (mut c_1 Client) pending_transaction_information(txid_1 string) &pending_transaction_information {
-// 	return &pending_transaction_information{
-// 		c_1: c_1
-// 		txid_1: txid_1
-// 	}
-// }
+pub fn (mut c Client) pending_transaction_information(txid string) &PendingTransactionInformation {
+	return &PendingTransactionInformation{
+		c: unsafe { c }
+		txid: txid
+	}
+}
 
 // pub fn (mut c_1 Client) get_application_by_id(applicationId_1 u64) &get_application_by_id {
 // 	return &get_application_by_id{

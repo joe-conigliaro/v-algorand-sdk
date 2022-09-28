@@ -1,17 +1,10 @@
 module common
 
 import context
-import io
-import io.util as ioutil
+// import io
+// import io.util as ioutil
 import net.http
 import net.urllib
-// import github.com.algorand.go-algorand-sdk.encoding.json
-// import github.com.algorand.go-algorand-sdk.encoding.msgpack
-// import github.com.google.go-querystring.query
-// import encoding.json
-// import encoding.msgpack
-// import github.com.google.go-querystring.query
-import strconv
 import json
 import x.json2
 
@@ -26,10 +19,21 @@ const raw_request_paths = {
 // type NotFound = error
 // type InternalError = error
 
-struct BadRequest { MessageError }
-struct InvalidToken { MessageError }
-struct NotFound { MessageError }
-struct InternalError { MessageError }
+struct BadRequest {
+	MessageError
+}
+
+struct InvalidToken {
+	MessageError
+}
+
+struct NotFound {
+	MessageError
+}
+
+struct InternalError {
+	MessageError
+}
 
 pub struct Header {
 mut:
@@ -62,23 +66,32 @@ pub fn make_client_with_headers(address string, api_header string, api_token str
 }
 
 // extractError checks if the response signifies an er
-fn extract_error(code int, error_buf []u8) ? {
-	if code == 200 { return }
+fn extract_error(code int, error_buf string) ? {
+	if code == 200 {
+		return
+	}
 	// wrapped_error := strconv.v_sprintf('HTTP %v: %s', code, error_buf)
-	error_buf_str := error_buf.bytestr()
-	wrapped_error := strconv.v_sprintf('HTTP %v: %s', code, error_buf_str)
+	wrapped_error := 'HTTP $code: $error_buf'
 	match code {
 		400 {
-			return IError(BadRequest{msg: wrapped_error})
+			return IError(BadRequest{
+				msg: wrapped_error
+			})
 		}
 		401 {
-			return IError(InvalidToken{msg: wrapped_error})
+			return IError(InvalidToken{
+				msg: wrapped_error
+			})
 		}
 		404 {
-			return IError(NotFound{msg: wrapped_error})
+			return IError(NotFound{
+				msg: wrapped_error
+			})
 		}
 		500 {
-			return IError(InternalError{msg: wrapped_error})
+			return IError(InternalError{
+				msg: wrapped_error
+			})
 		}
 		else {
 			return error(wrapped_error)
@@ -156,42 +169,41 @@ fn (mut client Client) submit_form_raw<T>(ctx context.Context, path string, para
 }
 
 fn (mut client Client) submit_form<T>(ctx_1 context.Context, path_1 string, params_1 T, request_method http.Method, encodeJSON_1 bool, headers_2 []&Header, body []u8) ?map[string]json2.Any {
-	mut resp := client.submit_form_raw(ctx_1, path_1, params_1, request_method, encodeJSON_1, headers_2, body)?
+	mut resp := client.submit_form_raw(ctx_1, path_1, params_1, request_method, encodeJSON_1,
+		headers_2, body)?
 	// defer {
 	// 	resp.body.close()
 	// }
 	// mut body_bytes := []u8{}
 	// body_bytes = ioutil.read_all(resp.body)?
-	body_bytes := resp.body
 
-	// mut response_err := extract_error(resp.status_code, body_bytes)
+	extract_error(resp.status_code, resp.body)?
 	// mut str_response, ok := response
 	// if ok {
 	// 	*str_response = body_bytes.str()
 	// 	return err_3
 	// }
 	// json = json.lenient_decode(body_bytes)?
-	json := json2.raw_decode(body_bytes)?
+	json := json2.raw_decode(resp.body)?
 	return json.as_map()
 }
 
 // Get performs a GET request to the specific path against the se
 pub fn (mut client Client) get<T>(ctx_2 context.Context, path_2 string, params_2 T, headers_3 []&Header) ?map[string]json2.Any {
-	return client.submit_form(ctx_2, path_2, params_2, http.Method.get, false, headers_3, [])
+	return client.submit_form(ctx_2, path_2, params_2, http.Method.get, false, headers_3,
+		[])
 }
 
 // GetRaw performs a GET request to the specific path against the server and returns the raw body by
 pub fn (mut client Client) get_raw<T>(ctx_3 context.Context, path_3 string, params_3 T, headers_4 []&Header) ?[]u8 {
-	resp_1 := client.submit_form_raw(ctx_3, path_3, params_3, http.Method.get, false, headers_4, [])
-	defer {
-		resp_1.body.close()
-	}
-	body_bytes := ioutil.read_all(resp_1.body)
-	if err_3 != unsafe { nil } {
-		return unsafe { nil }, err_3
-	}
-	extract_error(resp_1.status_code, body_bytes)
-	return body_bytes
+	resp := client.submit_form_raw(ctx_3, path_3, params_3, http.Method.get, false, headers_4,
+		[])
+	// defer {
+	// 	resp.body.close()
+	// }
+	// body_bytes := ioutil.read_all(resp.body)
+	extract_error(resp.status_code, resp.body)?
+	return resp.body.bytes()
 }
 
 // GetRawMsgpack performs a GET request to the specific path against the server and returns the decoded messagepack respo
@@ -218,7 +230,8 @@ pub fn (mut client Client) get_raw<T>(ctx_3 context.Context, path_3 string, para
 
 // Post sends a POST request to the given path with the given body obj
 pub fn (mut client Client) post<T>(ctx_5 context.Context, path_5 string, params_5 T, headers_6 []&Header, body []u8) ?map[string]json2.Any {
-	return client.submit_form(ctx_5, path_5, params_5, http.Method.post, true, headers_6, body)
+	return client.submit_form(ctx_5, path_5, params_5, http.Method.post, true, headers_6,
+		body)
 }
 
 // Helper function for correctly formatting and escaping URL path paramet

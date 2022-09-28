@@ -10,14 +10,15 @@ const (
 	padding_zeros      = bits_per_word - ((key_len_bytes * 8) % bits_per_word)
 )
 
-const(
-	sep_str = ' '
+const (
+	sep_str    = ' '
 	empty_byte = u8(0)
 )
 
 fn init() {
 	// Verify expected relationship between constants
-	if mnemonic_len_words*bits_per_word-checksum_len_bits != key_len_bytes*8+padding_zeros {
+	if mnemonic.mnemonic_len_words * mnemonic.bits_per_word - mnemonic.checksum_len_bits !=
+		mnemonic.key_len_bytes * 8 + mnemonic.padding_zeros {
 		panic('cannot initialize passphrase library: invalid constants')
 	}
 }
@@ -27,8 +28,8 @@ fn init() {
 // of data, and the last 11 bits are reserved for the checksum.
 fn from_key(key []u8) ?string {
 	// Ensure the key we are passed is the expected length
-	if key.len != key_len_bytes {
-		return errWrongKeyLen
+	if key.len != mnemonic.key_len_bytes {
+		return err_wrong_key_len
 	}
 
 	// Compute the checksum of these bytes
@@ -36,7 +37,7 @@ fn from_key(key []u8) ?string {
 	uint11_array := to_uint11_array(key)
 	words := apply_words(uint11_array, wordlist)
 	// return fmt.Sprintf('%s %s', strings.Join(words, ' '), chk), nil
-	return '${words.join(" ")} $chk'
+	return '${words.join(' ')} $chk'
 }
 
 // to_key converts a mnemonic generated using this library into the source
@@ -46,7 +47,7 @@ fn from_key(key []u8) ?string {
 fn to_key(mnemonic string) ?[]u8 {
 	// Split input on whitespace
 	// words_raw := strings.Split(mnemonic, sep_str)
-	words_raw := mnemonic.split(sep_str)
+	words_raw := mnemonic.split(mnemonic.sep_str)
 
 	// Strip out extra whitespace
 	mut words := []string{}
@@ -58,8 +59,8 @@ fn to_key(mnemonic string) ?[]u8 {
 	}
 
 	// Ensure the mnemonic is the correct length
-	if words.len != mnemonic_len_words {
-		return errWrongMnemonicLen
+	if words.len != mnemonic.mnemonic_len_words {
+		return err_wrong_mnemonic_len
 	}
 
 	// Check that all words are in list
@@ -71,7 +72,7 @@ fn to_key(mnemonic string) ?[]u8 {
 
 	// convert words to uin11array (Excluding the checksum word)
 	mut uint11_array := []u32{}
-	for i := 0; i < words.len-1; i++ {
+	for i := 0; i < words.len - 1; i++ {
 		// uint11_array = append(uint11_array, u32(index_of(wordlist, words[i])))
 		uint11_array << u32(index_of(wordlist, words[i]))
 	}
@@ -86,28 +87,28 @@ fn to_key(mnemonic string) ?[]u8 {
 	// While converting back to byte array, our new 264 bits array is divisible by 8 but the last byte is just the padding.
 
 	// Check that we have 33 bytes long array as expected
-	if byte_arr.len != key_len_bytes+1 {
-		return errWrongKeyLen
+	if byte_arr.len != mnemonic.key_len_bytes + 1 {
+		return err_wrong_key_len
 	}
 	// Check that the last one is actually 0
-	if byte_arr[key_len_bytes] != empty_byte {
-		return errWrongChecksum
+	if byte_arr[mnemonic.key_len_bytes] != mnemonic.empty_byte {
+		return err_wrong_checksum
 	}
 
 	// chop it !
 	// byte_arr = byte_arr[0:key_len_bytes]
-	byte_arr = byte_arr[..key_len_bytes]
+	byte_arr = byte_arr[..mnemonic.key_len_bytes]
 
 	// Pull out the checksum
 	mnemonic_checksum := checksum(byte_arr)
 
 	// Verify the checksum
-	if mnemonic_checksum != words[words.len-1] {
-		return errWrongChecksum
+	if mnemonic_checksum != words[words.len - 1] {
+		return err_wrong_checksum
 	}
 
 	// Verify that we recovered the correct amount of data
-	if byte_arr.len != key_len_bytes {
+	if byte_arr.len != mnemonic.key_len_bytes {
 		panic('passphrase:Mnemonicto_key is broken: recovered wrong amount of data')
 	}
 
@@ -129,18 +130,17 @@ fn to_uint11_array(arr []u8) []u32 {
 		if number_of_bit >= 11 {
 			// 0x7FF is 2047, the max 11 bit number
 			// output = append(output, buffer&0x7ff)
-			output << buffer&0x7ff
+			output << buffer & 0x7ff
 
 			// drop chunk from buffer
 			buffer = buffer >> 11
 			number_of_bit -= 11
 		}
-
 	}
 
 	if number_of_bit != 0 {
 		// output = append(output, buffer&0x7ff)
-		output << buffer&0x7ff
+		output << buffer & 0x7ff
 	}
 	return output
 }
@@ -158,7 +158,7 @@ fn to_byte_array(arr []u32) []u8 {
 
 		for number_of_bits >= 8 {
 			// output = append(output, u8(buffer&0xff))
-			output << u8(buffer&0xff)
+			output << u8(buffer & 0xff)
 			buffer >>= 8
 			number_of_bits -= 8
 		}

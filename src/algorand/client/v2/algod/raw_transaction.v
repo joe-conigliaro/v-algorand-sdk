@@ -1,8 +1,8 @@
 module algod
 
 import context
-import algorand.client.v2.common
-import algorand.client.v2.common.models
+// import algorand.client.v2.common
+// import algorand.client.v2.common.models
 
 // SendRawTransaction broadcasts a raw transaction to the network.
 // struct SendRawTransaction {
@@ -31,10 +31,7 @@ import algorand.client.v2.common.models
 // }
 
 pub fn (mut c Client) send_raw_transaction(ctx context.Context, raw_txn []u8) ?string {
-	resp := c.post(ctx, "/v2/transactions", unsafe { nil }, [], raw_txn)?
+	resp := c.post(ctx, '/v2/transactions', unsafe { nil }, [], raw_txn)?
 	// println('send_raw_transaction resp: $resp')
-	tx_id := resp['txid'] or {
-		return 'error decoding txid'
-	}
-	return tx_id.str()
+	return resp['txId'] or { 'error decoding txid' }.str()
 }
