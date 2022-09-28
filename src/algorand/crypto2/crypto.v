@@ -101,7 +101,7 @@ fn raw_transaction_bytes_to_sign(tx types.Transaction) []u8 {
 	// Prepend the hashable prefix
 	// msg_parts := [][]byte{txid_prefix, encoded_tx}
 	// return bytes.Join(msgParts, nil)
-	mut b := crypto2.txid_prefix.clone()
+	mut b := txid_prefix.clone()
 	b << encoded_tx
 	return b
 }
@@ -159,7 +159,7 @@ fn raw_sign_transaction(sk ed25519.PrivateKey, tx types.Transaction) ?(types.Sig
 fn sign_bytes(sk ed25519.PrivateKey, bytes_to_sign []u8) ?[]u8 {
 	// prepend the prefix for signing bytes
 	// to_be_signed := bytes.Join([][]u8{bytes_prefix, bytes_to_sign}, nil)
-	mut to_be_signed := crypto2.bytes_prefix.clone()
+	mut to_be_signed := bytes_prefix.clone()
 	to_be_signed << bytes_to_sign
 
 	// sign the bytes
@@ -170,7 +170,7 @@ fn sign_bytes(sk ed25519.PrivateKey, bytes_to_sign []u8) ?[]u8 {
 fn verify_bytes(pk ed25519.PublicKey, message []u8, signature []u8) bool {
 	// msg_parts := [][]byte{bytes_prefix, message}
 	// to_be_verified := bytes.Join(msg_parts, nil)
-	mut to_be_verified := crypto2.bytes_prefix.clone()
+	mut to_be_verified := bytes_prefix.clone()
 	to_be_verified << message
 	// return ed25519.verify(pk, to_be_verified, signature) or {
 	// 	false
@@ -190,7 +190,7 @@ fn sign_bid(sk ed25519.PrivateKey, bid types.Bid) ?[]u8 {
 	// Prepend the hashable prefix
 	// msg_parts := [][]byte{bid_prefix, encoded_bid}
 	// toBeSigned := bytes.Join(msg_parts, nil)
-	mut to_be_signed := crypto2.bid_prefix.clone()
+	mut to_be_signed := bid_prefix.clone()
 	to_be_signed << encoded_bid
 
 	// Sign the encoded bid
@@ -472,7 +472,7 @@ fn compute_group_id(txgroup []types.Transaction) ?types.Digest {
 	// Prepend the hashable prefix and hash it
 	// msg_parts := [][]u8{tgid_prefix, encoded}
 	// return sha512.Sum512_256(bytes.Join(msg_parts, nil)), nil
-	mut msg_parts := crypto2.tgid_prefix.clone()
+	mut msg_parts := tgid_prefix.clone()
 	msg_parts << encoded
 	return sha512.sum512_256(msg_parts)
 }
@@ -621,7 +621,7 @@ fn sign_logic_sig_transaction(lsig types.LogicSig, tx types.Transaction) ?(strin
 fn program_to_sign(program []u8) []u8 {
 	// parts := [][]u8{program_prefix, program}
 	// to_be_signed := bytes.Join(parts, nil)
-	mut to_be_signed := crypto2.program_prefix.clone()
+	mut to_be_signed := program_prefix.clone()
 	to_be_signed << program
 	return to_be_signed
 }
@@ -719,7 +719,7 @@ fn append_multisig_to_logic_sig(mut lsig types.LogicSig, sk ed25519.PrivateKey) 
 fn teal_sign(sk ed25519.PrivateKey, data []u8, contract_address types.Address) ?types.Signature {
 	// msg_parts := [][]u8{program_data_prefix, contract_address[:], data}
 	// to_be_signed := bytes.Join(msg_parts, nil)
-	mut to_be_signed := crypto2.program_data_prefix.clone()
+	mut to_be_signed := program_data_prefix.clone()
 	to_be_signed << contract_address
 	to_be_signed << data
 
@@ -746,7 +746,7 @@ fn teal_sign_from_program(sk ed25519.PrivateKey, data []u8, program []u8) ?types
 fn teal_verify(pk ed25519.PublicKey, data []u8, contract_address types.Address, raw_sig types.Signature) bool {
 	// msg_parts := [][]u8{program_data_prefix, contract_address[:], data}
 	// to_be_verified := bytes.Join(msg_parts, nil)
-	mut to_be_verified := crypto2.program_data_prefix.clone()
+	mut to_be_verified := program_data_prefix.clone()
 	to_be_verified << contract_address
 	to_be_verified << data
 
@@ -761,7 +761,7 @@ fn get_application_address(app_id u64) types.Address {
 
 	// parts := [][]u8{app_id_prefix, encoded_app_id}
 	// to_be_hashed := bytes.Join(parts, nil)
-	mut to_be_hashed := crypto2.app_id_prefix.clone()
+	mut to_be_hashed := app_id_prefix.clone()
 	to_be_hashed << encoded_app_id
 
 	hash := sha512.sum512_256(to_be_hashed)

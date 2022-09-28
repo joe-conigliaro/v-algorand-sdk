@@ -37,12 +37,12 @@ fn (mut c Client) post<T>(ctx_3 context.Context, path_3 string, params T, header
 
 // MakeClient is the factory for constructing a ClientV2 for a given endpo
 pub fn make_client(address string, apiToken string) ?&Client {
-	return &Client(common.make_client(address, algod.auth_header, apiToken)?)
+	return &Client(common.make_client(address, auth_header, apiToken)?)
 }
 
 // MakeClientWithHeaders is the factory for constructing a ClientV2 f
 pub fn make_client_with_headers(address_1 string, apiToken_1 string, headers_4 []&common.Header) ?&Client {
-	mut common_client_with_headers := common.make_client_with_headers(address_1, algod.auth_header,
+	mut common_client_with_headers := common.make_client_with_headers(address_1, auth_header,
 		apiToken_1, headers_4)?
 	return &Client(common_client_with_headers)
 }

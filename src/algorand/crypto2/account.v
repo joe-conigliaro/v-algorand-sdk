@@ -122,7 +122,7 @@ fn (ma MultisigAccount) address() ?types.Address {
 	// See go-algorand/crypto/multisig.go
 	ma.validate()?
 	// buffer := append([]byte(msig_add_prefix), byte(ma.version), byte(ma.threshold))
-	mut buffer := crypto2.msig_add_prefix.bytes()
+	mut buffer := msig_add_prefix.bytes()
 	buffer << ma.version
 	buffer << ma.threshold
 	for pki in ma.pks {
