@@ -39,4 +39,4 @@ demonstrates creating a new account (wallet & mnemonic) and submitting a transac
 
 # Status
 
-There are currently a lot of warnings printed, and features that are not implemented yet. Rest assured this is being actively developed.
+Many features are not implemented yet. Rest assured this is being actively developed.
