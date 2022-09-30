@@ -26,8 +26,8 @@ demonstrates creating a new account (wallet & mnemonic) and submitting a transac
  - Install v msgpack module: `v install msgpack`
  - Clone this repo: `git clone https://github.com/joe-conigliaro/v-algorand-sdk algorand`
  - Symlink the algorand module to `~/.vmodules`: `ln -s /full/path/to/algorand/src/algorand ~/.vmodules/algorand` 
- - You can now run `examples/basic_transaction.v`:
-    * Running it will walk you through submitting a transaction `v run algorand/examples/basic_transaction.v`
+ - You can now run `examples/basic_transaction.v` (it will walk you through submitting a transaction):
+    * Run the example: `v run algorand/examples/basic_transaction.v`
     * Verify the transaction was submitted to testnet `https://testnet.algoexplorer.io/tx/TRANSACTION_ID`
 
 ![Screenshot](examples/basic_transaction.png)
