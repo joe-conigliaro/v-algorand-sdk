@@ -21,7 +21,7 @@ demonstrates creating a new account (wallet & mnemonic) and submitting a transac
  - Setup an Algorand node (https://developer.algorand.org/docs/run-a-node/setup/install/)
  - You will choose a data directory when installing the default is `~/.algorand`
  - Start your node `goal node start -d ALGORAND_DATA_DIR`
- - Replace `algod_token` in `example1.v` with the contents of `ALGORAND_DATA_DIR/algod.token`
+ - Replace `algod_token` in `examples/basic_transaction.v` with the contents of `ALGORAND_DATA_DIR/algod.token`
  - You may also change the destination address, amount to send (make sure its no more than 5 Algo) etc.
  - Install v msgpack module: `v install msgpack`
  - Clone this repo: `git clone https://github.com/joe-conigliaro/v-algorand-sdk algorand`
